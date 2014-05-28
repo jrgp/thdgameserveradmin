@@ -15,15 +15,14 @@ import javax.swing.text.DefaultCaret;
  */
 public class KagAdminGUI extends javax.swing.JFrame {
 
-    private KagSocket Server;
+    private KagSocket Server = null;
+    private boolean Connected = false;
     
     /**
      * Creates new form KagAdminGUI
      */
     public KagAdminGUI() {
         initComponents();
-
-        
 
         DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -45,8 +44,12 @@ public class KagAdminGUI extends javax.swing.JFrame {
         ConsoleLog = new javax.swing.JTextArea();
         CommandBox = new javax.swing.JTextField();
         CommandButton = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("KAG Admin");
+        setMinimumSize(new java.awt.Dimension(600, 400));
 
         HostBox.setToolTipText("IP:PORT");
         HostBox.addActionListener(new java.awt.event.ActionListener() {
@@ -72,6 +75,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         ConsoleLog.setRows(5);
         jScrollPane1.setViewportView(ConsoleLog);
 
+        CommandBox.setEditable(false);
         CommandBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CommandBoxActionPerformed(evt);
@@ -79,6 +83,16 @@ public class KagAdminGUI extends javax.swing.JFrame {
         });
 
         CommandButton.setText("Run");
+        CommandButton.setEnabled(false);
+        CommandButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CommandButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Host:Port");
+
+        jLabel2.setText("Password");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -89,16 +103,20 @@ public class KagAdminGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(CommandBox)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 190, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(CommandBox)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CommandButton)))
+                        .addGap(0, 104, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -108,13 +126,17 @@ public class KagAdminGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton)
-                    .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 223, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 317, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(CommandButton, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(CommandBox, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(1, 1, 1)
+                        .addComponent(CommandBox, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
 
@@ -169,8 +191,9 @@ public class KagAdminGUI extends javax.swing.JFrame {
         
         System.out.println("passed checks");
         
-        Server = new KagSocket();
-        Server.setWindow(this);
+        ConnectButton.setEnabled(false);
+        
+        Server = new KagSocket(this);
         
         Server.setDetails(Host, Password, Port);
         Server.execute();
@@ -180,6 +203,18 @@ public class KagAdminGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_CommandBoxActionPerformed
 
+    private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
+        
+        String command = CommandBox.getText().trim();
+        CommandBox.setText("");
+        
+        if (command.length() == 0 || !Connected || Server == null) {
+            return;
+        }
+        
+        Server.sendCommand(command);
+    }//GEN-LAST:event_CommandButtonActionPerformed
+
     private void HandleDisonnect() {
         boolean success = Server.cancel(true);
         
@@ -187,8 +222,6 @@ public class KagAdminGUI extends javax.swing.JFrame {
             System.out.println("Cancelled worker");
         else
             System.out.println("Failed to cancel worker");
-        
-     //   Server.Disconnect();
     }
     
     public void addConsoleLine(String line) {
@@ -199,13 +232,21 @@ public class KagAdminGUI extends javax.swing.JFrame {
         ConnectButton.setText("Disconnect");
         HostBox.setEditable(false);
         PasswordBox.setEditable(false);
+        CommandBox.setEditable(true);
+        CommandButton.setEnabled(true);
+        Connected = true;
+        ConnectButton.setEnabled(true);
     }
 
     public void onDisconnect() {
         ConnectButton.setText("Connect");
         HostBox.setEditable(true);
         PasswordBox.setEditable(true);
-        
+        CommandBox.setEditable(false);
+        CommandBox.setText("");
+        CommandButton.setEnabled(false);
+        Connected = false;
+        ConnectButton.setEnabled(true);
         addConsoleLine("Disconnected..");
     }
     
@@ -251,6 +292,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
     private javax.swing.JTextArea ConsoleLog;
     private javax.swing.JTextField HostBox;
     private javax.swing.JPasswordField PasswordBox;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }

@@ -51,11 +51,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
     
     public Boolean Connected = false;
     
-    public KagSocket () {
-
-    }
-    
-    public void setWindow(KagAdminGUI Window) {
+    public KagSocket (KagAdminGUI Window) {
         this.Window = Window;
     }
     

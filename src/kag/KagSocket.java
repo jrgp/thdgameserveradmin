@@ -1,15 +1,30 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2014 Joe Gillotti
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
 package kag;
 
 import java.net.*;
 import java.io.*;
+import java.util.regex.*;
 import javax.swing.SwingWorker;
 import java.util.List;
+import java.util.ArrayList;
+
 
 class KagNotif {
 
@@ -117,7 +132,11 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
         
         String line;
         
-        // TCP RCON Connection
+        // [06:16:53]        [jrgp] (id 140) (ip 67.188.114.9) (hwid 1169726824)
+        
+        Pattern playerregex = Pattern.compile("\\[[\\d:]+\\]\\s+\\[(.+)\\] \\(id (\\d+)\\) \\(ip ([\\d\\.]+)\\) \\(hwid (\\d+)\\)");
+        Matcher playermatcher;
+        List<KagPlayer> foundPlayers = new ArrayList<KagPlayer>();
         
         try {
             for (;;) {
@@ -142,6 +161,26 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
                     
                 System.out.println("Received line via while");
                 line = line.trim();
+                
+                if ((playermatcher = playerregex.matcher(line)) != null
+                        && playermatcher.find()) {
+                    System.out.println("Found player "+playermatcher.group(1));
+                    
+                    try {
+                        foundPlayers.add(new KagPlayer(playermatcher.group(1), 
+                                Integer.parseInt(playermatcher.group(2)), playermatcher.group(3), playermatcher.group(4)));
+                    }
+                    catch (Exception e) {
+                    
+                    }
+                }
+                else {
+                    if (foundPlayers.size() > 0) {
+                        Window.drawPlayers(foundPlayers);
+                        foundPlayers.clear();
+                    }
+                }
+                
                 publish(KagNotif.lineFactory(line));
             }
         }

@@ -41,11 +41,25 @@ public class TabBody extends javax.swing.JPanel {
     
     private final DefaultTableModel PlayerModel;
     
+    private ServerType type;
+    
+    private String hostString = "";
+    
+    private ServerTabs tabController;
+    
     /**
      * Creates new form TabBody
      */
-    public TabBody() {
-        Regexes.init();
+    public TabBody(ServerType type, ServerTabs tabController) {
+        this.type = type;
+        this.tabController = tabController;
+        
+        if (type == type.KAG) {
+            KagRegexes.init();
+        }
+        else if (type == type.SOLDAT) {
+            SoldatRegexes.init();
+        }
         
         initComponents();
 
@@ -111,8 +125,6 @@ public class TabBody extends javax.swing.JPanel {
 
         jLabel2.setText("Password:");
 
-        PasswordBox.setText("jPasswordField1");
-
         ConnectButton.setText("Connect");
         ConnectButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,14 +171,14 @@ public class TabBody extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 212, Short.MAX_VALUE))
+                        .addGap(0, 94, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -223,6 +235,10 @@ public class TabBody extends javax.swing.JPanel {
         Server.sendCommand(command);
     }
     
+    public boolean isConnected() {
+        return Connected;
+    }
+    
     private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
                SendCommand();
     }//GEN-LAST:event_CommandButtonActionPerformed
@@ -272,11 +288,19 @@ public class TabBody extends javax.swing.JPanel {
         
         ConnectButton.setEnabled(false);
         
+        hostString = IpPort;
+        
         Server = new KagSocket(this);
         
         Server.setDetails(Host, Password, Port);
         Server.execute();
+        
+        tabController.fixTabs();
     }        
+    
+    public String getHostString() {
+        return hostString;
+    }
     
     private void HandleDisonnect() {
         boolean success = Server.cancel(true);
@@ -288,6 +312,9 @@ public class TabBody extends javax.swing.JPanel {
     }
     
     public void addConsoleLine(String line, String type) {
+        
+        tabController.fixTabs();
+        
         class StyledText {
             SimpleAttributeSet style;
             String text;
@@ -317,9 +344,9 @@ public class TabBody extends javax.swing.JPanel {
             StyleConstants.setBold(style, true);
             words.add(new StyledText(style, line));
         }
-        else if (type.equals("console")) {
+        else if (type.equals("console") && this.type == ServerType.KAG) {
             
-            if ((match = Regexes.lineRconConnect.matcher(line)) != null && match.find()) {
+            if ((match = KagRegexes.lineRconConnect.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
                 StyleConstants.setForeground(style, Color.darkGray);
@@ -334,7 +361,7 @@ public class TabBody extends javax.swing.JPanel {
                 
                 words.add(new StyledText(null, " is now authenticated"));
             }
-            else if ((match = Regexes.linePlayerSpeak.matcher(line)) != null && match.find()) {
+            else if ((match = KagRegexes.linePlayerSpeak.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
                 StyleConstants.setForeground(style, Color.darkGray);
@@ -353,7 +380,7 @@ public class TabBody extends javax.swing.JPanel {
                 StyleConstants.setForeground(style, Color.GRAY);
                 words.add(new StyledText(style, match.group(3)));                
             }
-            else if ((match = Regexes.lineRconCommand.matcher(line)) != null && match.find()) {
+            else if ((match = KagRegexes.lineRconCommand.matcher(line)) != null && match.find()) {
                 
                 // I do not care when people run /players
                 if (match.group(3).equals("/players")) {
@@ -379,7 +406,7 @@ public class TabBody extends javax.swing.JPanel {
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(3)));                
             }
-            else if ((match = Regexes.lineConsole.matcher(line)) != null && match.find()) {
+            else if ((match = KagRegexes.lineConsole.matcher(line)) != null && match.find()) {
                 
                 // don't care about empty shiz or other stuff we know happens
                 if (match.group(2).trim().length() == 0 || match.group(2).equals(" /players")) {
@@ -427,6 +454,7 @@ public class TabBody extends javax.swing.JPanel {
         Connected = true;
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
+        tabController.fixTabs();
     }
 
     public void onDisconnect() {
@@ -440,6 +468,7 @@ public class TabBody extends javax.swing.JPanel {
         ConnectButton.setEnabled(true);
         addConsoleLine("Disconnected..", "disconnect");
         drawPlayers(new ArrayList<>());
+        tabController.fixTabs();
     }
     
     public void drawPlayers(List<KagPlayer> players) {

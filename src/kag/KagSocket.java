@@ -68,7 +68,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
     
     public KagSocket (TabBody Window) {
         this.Window = Window;
-        Regexes.init();
+        KagRegexes.init();
     }
     
     public void setDetails(String Host, String Password, Integer Port) {
@@ -178,7 +178,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
                 System.out.println("Received line via while: '"+line+"'");
                 line = line.trim();
                 
-                if ((playermatcher = Regexes.linePlayer.matcher(line)) != null
+                if ((playermatcher = KagRegexes.linePlayer.matcher(line)) != null
                         && playermatcher.find()) {
                     
                     int playerID = 0;
@@ -194,7 +194,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
                     
                     continue;
                 }
-                else if (Regexes.linePlayersListStart.matcher(line).matches()) {
+                else if (KagRegexes.linePlayersListStart.matcher(line).matches()) {
                     findingPlayers = true;
                     continue;
                 }

@@ -18,12 +18,17 @@
 
 package kag;
 
+import java.awt.Color;
+import java.util.ArrayList;
+
 /**
  *
  * @author joe
  */
 public class ServerTabs extends javax.swing.JFrame {
 
+    ArrayList<TabBody> serverTabs;
+    
     /**
      * Creates new form ServerTabs
      */
@@ -41,14 +46,15 @@ public class ServerTabs extends javax.swing.JFrame {
     private void initComponents() {
 
         Tabs = new javax.swing.JTabbedPane();
-        jButton1 = new javax.swing.JButton();
+        addTabButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setMinimumSize(new java.awt.Dimension(600, 600));
 
-        jButton1.setText("Add Tab");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        addTabButton.setText("Add Tab");
+        addTabButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                addTabButtonActionPerformed(evt);
             }
         });
 
@@ -60,7 +66,7 @@ public class ServerTabs extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
+                        .addComponent(addTabButton)
                         .addContainerGap(523, Short.MAX_VALUE))
                     .addComponent(Tabs, javax.swing.GroupLayout.Alignment.TRAILING)))
         );
@@ -68,7 +74,7 @@ public class ServerTabs extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton1)
+                .addComponent(addTabButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                 .addContainerGap())
@@ -77,10 +83,32 @@ public class ServerTabs extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Tabs.addTab("Server", new TabBody());
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void addTabButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addTabButtonActionPerformed
+        ServerType type = ServerType.KAG;
+        TabBody tab = new TabBody(type, this);
+        
+        Tabs.addTab("Server", tab);
+    }//GEN-LAST:event_addTabButtonActionPerformed
 
+    public void fixTabs() {
+        int tabcount = Tabs.getTabCount();
+        for (int index = 0; index < tabcount; index++) {
+            TabBody tab = (TabBody) Tabs.getComponentAt(index);
+            String title = tab.getHostString();
+            title = title.length() == 0 ? "Server" : title;
+
+            if (tab.isConnected()) {
+                Tabs.setForegroundAt(index, Color.GREEN);
+                Tabs.setBackgroundAt(index, Color.BLACK);
+            }
+            else {
+                Tabs.setForegroundAt(index, Color.RED);
+                Tabs.setBackgroundAt(index, Color.BLACK);
+            }
+            Tabs.setTitleAt(index, title+(title.equals("Server") ? "" : (tab.isConnected() ? " (Connected)" : " (Disconnected)")));
+        }
+    }
+    
     /**
      * @param args the command line arguments
      */
@@ -118,6 +146,6 @@ public class ServerTabs extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTabbedPane Tabs;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton addTabButton;
     // End of variables declaration//GEN-END:variables
 }

@@ -24,7 +24,7 @@ import java.util.regex.*;
  *
  * @author joe
  */
-public class Regexes {
+public class KagRegexes {
     
     public static Pattern linePlayer;
     public static Pattern linePlayersListStart;

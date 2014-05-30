@@ -19,7 +19,6 @@
 package kag;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
@@ -30,32 +29,39 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.plaf.metal.MetalIconFactory;
 
 /**
  *
  * @author joe
  */
 public class TabUtils {
-    private static final String kagIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/kag_icon.png";
-    private static final String SoldatIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/soldat_icon.png";
+   // private static final String kagIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/kag_icon.png";
+  //  private static final String SoldatIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/soldat_icon.png";
 
+    private static final String kagIconPath = "kag_icon.png";
+    private static final String SoldatIconPath = "soldat_icon.png";
+    
     private static ImageIcon kagIcon = null;
     private static ImageIcon soldatIcon = null;
     
     public static Icon getIcon(ServerType type) {
         
         Icon icon = null;
-        
-        if (type == type.KAG) {
-            if (kagIcon == null)
-                kagIcon = new ImageIcon(kagIconPath);
-            icon = kagIcon;
-        }
-        else if (type == type.SOLDAT) {
-            if (soldatIcon == null)
-                soldatIcon = new ImageIcon(SoldatIconPath);
-            icon = soldatIcon;
+
+        try {
+            if (type == type.KAG) {
+                if (kagIcon == null)
+                    kagIcon = new ImageIcon(ClassLoader.getSystemResource(kagIconPath));
+                icon = kagIcon;
+            }
+            else if (type == type.SOLDAT) {
+                if (soldatIcon == null)
+                    soldatIcon = new ImageIcon(ClassLoader.getSystemResource(SoldatIconPath));
+                icon = soldatIcon;
+            }
+        } 
+        catch (Exception e) {
+            return null;
         }
         
         return icon;

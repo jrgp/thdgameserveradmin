@@ -68,6 +68,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
     
     public KagSocket (KagAdminGUI Window) {
         this.Window = Window;
+        Regexes.init();
     }
     
     public void setDetails(String Host, String Password, Integer Port) {
@@ -134,18 +135,33 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
         
         // [06:16:53]        [jrgp] (id 140) (ip 67.188.114.9) (hwid 1169726824)
         
-        Pattern playerregex = Pattern.compile("\\[[\\d:]+\\]\\s+\\[(.+)\\] \\(id (\\d+)\\) \\(ip ([\\d\\.]+)\\) \\(hwid (\\d+)\\)");
         Matcher playermatcher;
-        List<KagPlayer> foundPlayers = new ArrayList<KagPlayer>();
+        List<KagPlayer> foundPlayers = new ArrayList<>();
+        
+        int i;
+        boolean findingPlayers = false;
         
         try {
-            for (;;) {
+            for (i = 0; ;i++) {
                 
+                // Only way we can watch for this thread being killed (user clicking disconnect)
+                // is if we çheck the result of this method call often
                 if (Thread.interrupted()) {
                     System.out.println("got interrupt");
                     throw new InterruptedException();
                 }
 
+                // With java there is no way of detecting when a socket closes on the remote end except
+                // to see if writing fails. Fortunately kag doesn't care if we send it shit. We can conveiently
+                // use this to check for players...
+                if (i % 100 == 0) {
+                    System.out.println("Sending keepalive to see if writing fails which means we're disconnected");
+                    Out.writeBytes("/players\n");
+                    Out.flush();
+                }
+
+                // We don't want to block on waiting for input in case the interrupt is triggered
+                // and we're waiting for a line from the server before we can notice
                 if (!In.ready()) {
                     Thread.sleep(100);
                     continue;
@@ -159,23 +175,38 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
                     publish(KagNotif.eventFactory("Connected"));
                 }
                     
-                System.out.println("Received line via while");
+                System.out.println("Received line via while: '"+line+"'");
                 line = line.trim();
                 
-                if ((playermatcher = playerregex.matcher(line)) != null
+                if ((playermatcher = Regexes.linePlayer.matcher(line)) != null
                         && playermatcher.find()) {
-                    System.out.println("Found player "+playermatcher.group(1));
+                    
+                    int playerID = 0;
                     
                     try {
-                        foundPlayers.add(new KagPlayer(playermatcher.group(1), 
-                                Integer.parseInt(playermatcher.group(2)), playermatcher.group(3), playermatcher.group(4)));
+                        playerID = Integer.parseInt(playermatcher.group(2));
                     }
-                    catch (Exception e) {
+                    catch (NumberFormatException e) {
+                    }
+
+                    foundPlayers.add(new KagPlayer(playermatcher.group(1), 
+                        playerID, playermatcher.group(3), playermatcher.group(4)));
                     
-                    }
+                    continue;
+                }
+                else if (Regexes.linePlayersListStart.matcher(line).matches()) {
+                    findingPlayers = true;
+                    continue;
                 }
                 else {
                     if (foundPlayers.size() > 0) {
+                        Window.drawPlayers(foundPlayers);
+                        foundPlayers.clear();
+                    }
+                    
+                    // Empty list? no players brah
+                    else if (findingPlayers) {
+                        findingPlayers = false;
                         Window.drawPlayers(foundPlayers);
                         foundPlayers.clear();
                     }
@@ -202,7 +233,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
         for (KagNotif notif : messages) {
             if (notif.Type.equals("line")) {
                 System.out.println("Recieved line via process: "+notif.Line);
-                Window.addConsoleLine(notif.Line);
+                Window.addConsoleLine(notif.Line, "console");
             }
             else if (notif.Type.equals("event") && notif.Event.equals("Disconnected")) {
                 Window.onDisconnect();

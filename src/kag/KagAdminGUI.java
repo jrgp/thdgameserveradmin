@@ -18,11 +18,17 @@
 
 package kag;
 
+import java.awt.Color;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.text.DefaultCaret;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.regex.Matcher;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 /**
  *
@@ -33,12 +39,15 @@ public class KagAdminGUI extends javax.swing.JFrame {
     private KagSocket Server = null;
     private boolean Connected = false;
     
-    private DefaultTableModel PlayerModel;
+    private final DefaultTableModel PlayerModel;
     
     /**
      * Creates new form KagAdminGUI
      */
     public KagAdminGUI() {
+        
+        Regexes.init();
+        
         initComponents();
 
         DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
@@ -83,19 +92,20 @@ public class KagAdminGUI extends javax.swing.JFrame {
         HostBox = new javax.swing.JTextField();
         ConnectButton = new javax.swing.JButton();
         PasswordBox = new javax.swing.JPasswordField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        ConsoleLog = new javax.swing.JTextArea();
         CommandBox = new javax.swing.JTextField();
         CommandButton = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         PlayerTable = new javax.swing.JTable();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        ConsoleLog = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("KAG Admin");
         setMinimumSize(new java.awt.Dimension(600, 400));
 
+        HostBox.setText("node-fl2.gshost.us:9000");
         HostBox.setToolTipText("IP:PORT");
         HostBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -110,15 +120,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
             }
         });
 
+        PasswordBox.setText("cuntzzz");
         PasswordBox.setToolTipText("Password");
-
-        ConsoleLog.setEditable(false);
-        ConsoleLog.setBackground(new java.awt.Color(0, 0, 0));
-        ConsoleLog.setColumns(20);
-        ConsoleLog.setFont(new java.awt.Font("Monaco", 0, 12)); // NOI18N
-        ConsoleLog.setForeground(new java.awt.Color(204, 204, 204));
-        ConsoleLog.setRows(5);
-        jScrollPane1.setViewportView(ConsoleLog);
 
         CommandBox.setEditable(false);
         CommandBox.addActionListener(new java.awt.event.ActionListener() {
@@ -149,20 +152,25 @@ public class KagAdminGUI extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(PlayerTable);
 
+        ConsoleLog.setEditable(false);
+        ConsoleLog.setBackground(new java.awt.Color(0, 0, 0));
+        ConsoleLog.setForeground(new java.awt.Color(153, 153, 153));
+        jScrollPane3.setViewportView(ConsoleLog);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jScrollPane1)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane3)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -187,8 +195,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -220,8 +228,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
         String IpPort = HostBox.getText();
         String Password = new String(PasswordBox.getPassword());
         
-        String Host = null;
-        Integer Port = null;
+        String Host;
+        Integer Port;
         
         String parts[] = IpPort.split(":");
         
@@ -282,8 +290,108 @@ public class KagAdminGUI extends javax.swing.JFrame {
             System.out.println("Failed to cancel worker");
     }
     
-    public void addConsoleLine(String line) {
-        ConsoleLog.append(line+"\n");
+    public void addConsoleLine(String line, String type) {
+        class StyledText {
+            SimpleAttributeSet style;
+            String text;
+            public  StyledText(SimpleAttributeSet style, String text) {
+                this.text = text;
+                this.style = style;
+            }
+        }
+        
+        StyledDocument doc = ConsoleLog.getStyledDocument();
+        
+        List<StyledText> words = new ArrayList<>();
+        
+        Matcher match;
+        
+        SimpleAttributeSet style;
+        
+        if (type.equals("connect")) {
+            style = new SimpleAttributeSet();
+            StyleConstants.setForeground(style, Color.GREEN);
+            StyleConstants.setBold(style, true);
+            words.add(new StyledText(style, line));
+        }
+        else if (type.equals("disconnect")) {
+            style = new SimpleAttributeSet();
+            StyleConstants.setForeground(style, Color.RED);
+            StyleConstants.setBold(style, true);
+            words.add(new StyledText(style, line));
+        }
+        else if (type.equals("console")) {
+            
+            if ((match = Regexes.lineRconConnect.matcher(line)) != null && match.find()) {
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                StyleConstants.setForeground(style, Color.darkGray);
+                words.add(new StyledText(style, match.group(1)));
+                
+                words.add(new StyledText(null, " TCP RCON Connection from "));
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(2)));
+                
+                words.add(new StyledText(null, " is now authenticated"));
+            }
+            else if ((match = Regexes.linePlayerSpeak.matcher(line)) != null && match.find()) {
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                StyleConstants.setForeground(style, Color.darkGray);
+                words.add(new StyledText(style, match.group(1)));
+                
+                words.add(new StyledText(null, " <"));
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(2)));
+                
+                words.add(new StyledText(null, "> "));
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.GRAY);
+                words.add(new StyledText(style, match.group(3)));                
+            }
+            else if ((match = Regexes.lineConsole.matcher(line)) != null && match.find()) {
+                
+                // style and add the timestamp
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                StyleConstants.setForeground(style, Color.darkGray);
+                words.add(new StyledText(style, match.group(1)));
+                
+                // and the unstyled space between them
+                words.add(new StyledText(null, " "));
+                
+                // and the rest of the message
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.GRAY);
+                words.add(new StyledText(style, match.group(2)));
+            }
+            
+            // something our regex didn't pickup... gray that fucker out
+            else {
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.GRAY);
+                words.add(new StyledText(style, line));
+            }
+        }
+        
+        // unstyled newline
+        words.add(new StyledText(null, "\n"));
+        
+        try {
+            for (StyledText text : words) {
+                doc.insertString(doc.getLength(), text.text, text.style);
+            }
+        }
+        catch (BadLocationException e) {
+            
+        }
     }
     
     public void onConnect() {
@@ -294,6 +402,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         CommandButton.setEnabled(true);
         Connected = true;
         ConnectButton.setEnabled(true);
+        addConsoleLine("Connected", "connect");
     }
 
     public void onDisconnect() {
@@ -305,7 +414,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
         CommandButton.setEnabled(false);
         Connected = false;
         ConnectButton.setEnabled(true);
-        addConsoleLine("Disconnected..");
+        addConsoleLine("Disconnected..", "disconnect");
+        drawPlayers(new ArrayList<>());
     }
     
     public void drawPlayers(List<KagPlayer> players) {
@@ -359,13 +469,13 @@ public class KagAdminGUI extends javax.swing.JFrame {
     private javax.swing.JTextField CommandBox;
     private javax.swing.JButton CommandButton;
     private javax.swing.JButton ConnectButton;
-    private javax.swing.JTextArea ConsoleLog;
+    private javax.swing.JTextPane ConsoleLog;
     private javax.swing.JTextField HostBox;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     // End of variables declaration//GEN-END:variables
 }

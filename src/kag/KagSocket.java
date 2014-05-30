@@ -202,6 +202,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
                     if (foundPlayers.size() > 0) {
                         Window.drawPlayers(foundPlayers);
                         foundPlayers.clear();
+                        findingPlayers = false;
                     }
                     
                     // Empty list? no players brah

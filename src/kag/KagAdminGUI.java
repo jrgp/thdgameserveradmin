@@ -19,6 +19,7 @@
 package kag;
 
 import java.awt.Color;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 import javax.swing.text.DefaultCaret;
@@ -89,6 +90,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
         HostBox = new javax.swing.JTextField();
         ConnectButton = new javax.swing.JButton();
         PasswordBox = new javax.swing.JPasswordField();
@@ -122,11 +124,21 @@ public class KagAdminGUI extends javax.swing.JFrame {
 
         PasswordBox.setText("cuntzzz");
         PasswordBox.setToolTipText("Password");
+        PasswordBox.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                PasswordBoxKeyTyped(evt);
+            }
+        });
 
         CommandBox.setEditable(false);
         CommandBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CommandBoxActionPerformed(evt);
+            }
+        });
+        CommandBox.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                CommandBoxKeyTyped(evt);
             }
         });
 
@@ -161,16 +173,16 @@ public class KagAdminGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -186,7 +198,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton)
@@ -194,9 +206,9 @@ public class KagAdminGUI extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 110, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 196, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 211, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -266,11 +278,24 @@ public class KagAdminGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_ConnectButtonActionPerformed
 
     private void CommandBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandBoxActionPerformed
-        // TODO add your handling code here:
+        HandleConnect();
     }//GEN-LAST:event_CommandBoxActionPerformed
 
     private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
-        
+        SendCommand();
+    }//GEN-LAST:event_CommandButtonActionPerformed
+
+    private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_PasswordBoxKeyTyped
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            HandleConnect();
+    }//GEN-LAST:event_PasswordBoxKeyTyped
+
+    private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CommandBoxKeyTyped
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            HandleConnect();
+    }//GEN-LAST:event_CommandBoxKeyTyped
+
+    private void SendCommand() {
         String command = CommandBox.getText().trim();
         CommandBox.setText("");
         
@@ -279,8 +304,8 @@ public class KagAdminGUI extends javax.swing.JFrame {
         }
         
         Server.sendCommand(command);
-    }//GEN-LAST:event_CommandButtonActionPerformed
-
+    }
+    
     private void HandleDisonnect() {
         boolean success = Server.cancel(true);
         
@@ -343,37 +368,65 @@ public class KagAdminGUI extends javax.swing.JFrame {
                 StyleConstants.setForeground(style, Color.darkGray);
                 words.add(new StyledText(style, match.group(1)));
                 
-                words.add(new StyledText(null, " <"));
+                words.add(new StyledText(null, " "));
                 
                 style = new SimpleAttributeSet();
                 StyleConstants.setForeground(style, Color.BLACK);
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
                 
-                words.add(new StyledText(null, "> "));
+                words.add(new StyledText(null, " "));
                 
                 style = new SimpleAttributeSet();
                 StyleConstants.setForeground(style, Color.GRAY);
                 words.add(new StyledText(style, match.group(3)));                
             }
-            else if ((match = Regexes.lineConsole.matcher(line)) != null && match.find()) {
+            else if ((match = Regexes.lineRconCommand.matcher(line)) != null && match.find()) {
                 
-                // style and add the timestamp
+                // I do not care when people run /players
+                if (match.group(3).equals("/players")) {
+                    return;
+                }
+                
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
                 StyleConstants.setForeground(style, Color.darkGray);
                 words.add(new StyledText(style, match.group(1)));
                 
-                // and the unstyled space between them
+                words.add(new StyledText(null, " RCON command from "));
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(2)));
+                
+                words.add(new StyledText(null, ": "));
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(3)));                
+            }
+            else if ((match = Regexes.lineConsole.matcher(line)) != null && match.find()) {
+                
+                // don't care about empty shiz or other stuff we know happens
+                if (match.group(2).trim().length() == 0 || match.group(2).equals(" /players")) {
+                    return;
+                }
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                StyleConstants.setForeground(style, Color.darkGray);
+                words.add(new StyledText(style, match.group(1)));
+                
                 words.add(new StyledText(null, " "));
                 
-                // and the rest of the message
                 style = new SimpleAttributeSet();
                 StyleConstants.setForeground(style, Color.GRAY);
                 words.add(new StyledText(style, match.group(2)));
             }
             
-            // something our regex didn't pickup... gray that fucker out
+            // something our regexen didn't pickup... gray that fucker out
             else {
                 style = new SimpleAttributeSet();
                 StyleConstants.setForeground(style, Color.GRAY);
@@ -381,7 +434,6 @@ public class KagAdminGUI extends javax.swing.JFrame {
             }
         }
         
-        // unstyled newline
         words.add(new StyledText(null, "\n"));
         
         try {
@@ -473,6 +525,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
     private javax.swing.JTextField HostBox;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
+    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane2;

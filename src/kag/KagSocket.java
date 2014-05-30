@@ -59,14 +59,14 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
     private BufferedReader In = null;
     private DataOutputStream Out = null;
     
-    private KagAdminGUI Window;
+    private TabBody Window;
     
     private String Host, Password;
     private Integer Port;
     
     public Boolean Connected = false;
     
-    public KagSocket (KagAdminGUI Window) {
+    public KagSocket (TabBody Window) {
         this.Window = Window;
         Regexes.init();
     }

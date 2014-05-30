@@ -1,5 +1,20 @@
+package kag;
+
+import java.awt.Color;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
+
 /*
- * Copyright (C) 2014 Joe Gillotti
+ * Copyright (C) 2014 joe
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,43 +31,26 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package kag;
-
-import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.util.ArrayList;
-import javax.swing.JOptionPane;
-import javax.swing.text.DefaultCaret;
-import java.util.List;
-import java.util.regex.Matcher;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.text.BadLocationException;
-import javax.swing.text.SimpleAttributeSet;
-import javax.swing.text.StyleConstants;
-import javax.swing.text.StyledDocument;
-
 /**
  *
  * @author joe
  */
-public class KagAdminGUI extends javax.swing.JFrame {
-
+public class TabBody extends javax.swing.JPanel {
     private KagSocket Server = null;
     private boolean Connected = false;
     
     private final DefaultTableModel PlayerModel;
     
     /**
-     * Creates new form KagAdminGUI
+     * Creates new form TabBody
      */
-    public KagAdminGUI() {
-        
+    public TabBody() {
         Regexes.init();
         
         initComponents();
 
-        DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+      //  DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
+     //   caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
         PlayerModel = new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -79,6 +77,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         };
         
         PlayerTable.setModel(PlayerModel);
+    
     }
 
     /**
@@ -90,30 +89,29 @@ public class KagAdminGUI extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0));
+        jLabel1 = new javax.swing.JLabel();
         HostBox = new javax.swing.JTextField();
-        ConnectButton = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         PasswordBox = new javax.swing.JPasswordField();
+        ConnectButton = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        PlayerTable = new javax.swing.JTable();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ConsoleLog = new javax.swing.JTextPane();
         CommandBox = new javax.swing.JTextField();
         CommandButton = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jLabel2 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        PlayerTable = new javax.swing.JTable();
-        jScrollPane3 = new javax.swing.JScrollPane();
-        ConsoleLog = new javax.swing.JTextPane();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("KAG Admin");
-        setMinimumSize(new java.awt.Dimension(600, 400));
+        jLabel1.setText("IP:port");
 
-        HostBox.setText("node-fl2.gshost.us:9000");
-        HostBox.setToolTipText("IP:PORT");
         HostBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 HostBoxActionPerformed(evt);
             }
         });
+
+        jLabel2.setText("Password:");
+
+        PasswordBox.setText("jPasswordField1");
 
         ConnectButton.setText("Connect");
         ConnectButton.addActionListener(new java.awt.event.ActionListener() {
@@ -121,38 +119,6 @@ public class KagAdminGUI extends javax.swing.JFrame {
                 ConnectButtonActionPerformed(evt);
             }
         });
-
-        PasswordBox.setText("cuntzzz");
-        PasswordBox.setToolTipText("Password");
-        PasswordBox.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                PasswordBoxKeyTyped(evt);
-            }
-        });
-
-        CommandBox.setEditable(false);
-        CommandBox.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CommandBoxActionPerformed(evt);
-            }
-        });
-        CommandBox.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                CommandBoxKeyTyped(evt);
-            }
-        });
-
-        CommandButton.setText("Run");
-        CommandButton.setEnabled(false);
-        CommandButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                CommandButtonActionPerformed(evt);
-            }
-        });
-
-        jLabel1.setText("Host:Port");
-
-        jLabel2.setText("Password");
 
         PlayerTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -162,37 +128,49 @@ public class KagAdminGUI extends javax.swing.JFrame {
 
             }
         ));
-        jScrollPane2.setViewportView(PlayerTable);
+        PlayerTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(PlayerTable);
 
         ConsoleLog.setEditable(false);
-        ConsoleLog.setBackground(new java.awt.Color(0, 0, 0));
-        ConsoleLog.setForeground(new java.awt.Color(153, 153, 153));
-        jScrollPane3.setViewportView(ConsoleLog);
+        jScrollPane2.setViewportView(ConsoleLog);
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
+        CommandBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CommandBoxActionPerformed(evt);
+            }
+        });
+
+        CommandButton.setText("Run");
+        CommandButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                CommandButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
+        this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 705, Short.MAX_VALUE)
+                    .addComponent(jScrollPane2)
+                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 132, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addGap(0, 212, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(CommandButton)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -200,39 +178,64 @@ public class KagAdminGUI extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(ConnectButton)
-                    .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel1)
                     .addComponent(HostBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel1)
+                    .addComponent(jLabel2)
+                    .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(ConnectButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 129, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CommandBox, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(CommandButton, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(CommandButton))
                 .addContainerGap())
         );
-
-        pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void HostBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HostBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_HostBoxActionPerformed
 
+    private void CommandBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_CommandBoxActionPerformed
+
     private void ConnectButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ConnectButtonActionPerformed
-        
         if (ConnectButton.getText().equals("Disconnect")) {
             HandleDisonnect();
         }
         else if (ConnectButton.getText().equals("Connect")) {
             System.out.println("clicked connect");
             HandleConnect();
+        } 
+    }//GEN-LAST:event_ConnectButtonActionPerformed
+    private void SendCommand() {
+        String command = CommandBox.getText().trim();
+        CommandBox.setText("");
+        
+        if (command.length() == 0 || !Connected || Server == null) {
+            return;
         }
+        
+        Server.sendCommand(command);
     }
+    
+    private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
+               SendCommand();
+    }//GEN-LAST:event_CommandButtonActionPerformed
+
+    private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {                                     
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            HandleConnect();
+    }                                    
+
+    private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {                                    
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            HandleConnect();
+    }   
     
     private void HandleConnect() {
         String IpPort = HostBox.getText();
@@ -273,36 +276,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         
         Server.setDetails(Host, Password, Port);
         Server.execute();
-    }//GEN-LAST:event_ConnectButtonActionPerformed
-
-    private void CommandBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandBoxActionPerformed
-        HandleConnect();
-    }//GEN-LAST:event_CommandBoxActionPerformed
-
-    private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
-        SendCommand();
-    }//GEN-LAST:event_CommandButtonActionPerformed
-
-    private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_PasswordBoxKeyTyped
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
-            HandleConnect();
-    }//GEN-LAST:event_PasswordBoxKeyTyped
-
-    private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_CommandBoxKeyTyped
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
-            HandleConnect();
-    }//GEN-LAST:event_CommandBoxKeyTyped
-
-    private void SendCommand() {
-        String command = CommandBox.getText().trim();
-        CommandBox.setText("");
-        
-        if (command.length() == 0 || !Connected || Server == null) {
-            return;
-        }
-        
-        Server.sendCommand(command);
-    }
+    }        
     
     private void HandleDisonnect() {
         boolean success = Server.cancel(true);
@@ -480,41 +454,7 @@ public class KagAdminGUI extends javax.swing.JFrame {
         }
     }
     
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(KagAdminGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(KagAdminGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(KagAdminGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(KagAdminGUI.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new KagAdminGUI().setVisible(true);
-            }
-        });
-    }
-
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField CommandBox;
     private javax.swing.JButton CommandButton;
@@ -523,10 +463,9 @@ public class KagAdminGUI extends javax.swing.JFrame {
     private javax.swing.JTextField HostBox;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
-    private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane3;
     // End of variables declaration//GEN-END:variables
 }

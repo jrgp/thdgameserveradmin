@@ -94,6 +94,10 @@ public class TabBody extends javax.swing.JPanel {
     
     }
 
+    public ServerType getType() {
+        return type;
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -302,7 +306,11 @@ public class TabBody extends javax.swing.JPanel {
         return hostString;
     }
     
-    private void HandleDisonnect() {
+    public void HandleDisonnect() {
+        
+        if (Server == null)
+            return;
+        
         boolean success = Server.cancel(true);
         
         if (success)

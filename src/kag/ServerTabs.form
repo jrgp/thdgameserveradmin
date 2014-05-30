@@ -4,7 +4,7 @@
   <Properties>
     <Property name="defaultCloseOperation" type="int" value="3"/>
     <Property name="minimumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
-      <Dimension value="[600, 600]"/>
+      <Dimension value="[600, 400]"/>
     </Property>
   </Properties>
   <SyntheticProperties>
@@ -30,8 +30,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Group type="102" alignment="0" attributes="0">
-                      <Component id="addTabButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace pref="523" max="32767" attributes="0"/>
+                      <Component id="addKagButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="addSoldatButton" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace pref="342" max="32767" attributes="0"/>
                   </Group>
                   <Component id="Tabs" alignment="1" max="32767" attributes="0"/>
               </Group>
@@ -42,7 +44,10 @@
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="addTabButton" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="addKagButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="addSoldatButton" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="Tabs" pref="353" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -55,13 +60,18 @@
 
       <Layout class="org.netbeans.modules.form.compat2.layouts.support.JTabbedPaneSupportLayout"/>
     </Container>
-    <Component class="javax.swing.JButton" name="addTabButton">
+    <Component class="javax.swing.JButton" name="addKagButton">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Add Tab"/>
+        <Property name="text" type="java.lang.String" value="Add KAG Tab"/>
       </Properties>
       <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addTabButtonActionPerformed"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addKagButtonActionPerformed"/>
       </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="addSoldatButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Add Soldat Tab"/>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

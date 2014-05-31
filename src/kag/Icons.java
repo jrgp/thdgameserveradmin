@@ -20,6 +20,7 @@ package kag;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import static kag.IpCountry.lookup;
 
 /**
  *
@@ -69,6 +70,22 @@ public class Icons {
         } 
         catch (Exception e) {
             return icon;
+        }
+        
+        return icon;
+    }
+    
+    
+    public static Icon ipCountryIcon(String ip) {
+        String code = lookup(ip);
+        String path = "res/flags/"+code.toLowerCase()+".png";
+        Icon icon;
+        try {
+             icon = new ImageIcon(path);
+        }
+        catch (Exception e) {
+            System.out.println("Failed getting icon: "+e);
+            return null;
         }
         
         return icon;

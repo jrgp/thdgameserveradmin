@@ -6,11 +6,13 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -34,8 +36,27 @@ import javax.swing.text.StyledDocument;
  */
 
 class ColorString {
-    String string;
+    public ColorString () {
+        
+    }
+    public ColorString (Color color, String string) {
+        this.color = color;
+        this.string = string;
+    }
     Color color;
+    String string;
+}
+
+class IconString {
+    public IconString () {
+        
+    }
+    public IconString (Icon icon, String string) {
+        this.icon = icon;
+        this.string = string;
+    }
+    Icon icon;
+    String string;
 }
 
 /**
@@ -75,16 +96,11 @@ public class TabBody extends javax.swing.JPanel {
         else if (type == ServerType.SOLDAT) {
             SoldatRegexes.init();
         }
-        
-        Conf.load();
-        
-       
 
-      //  DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
-     //   caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
+        DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
        
-        // Add color capabilities to the cell renderer. Spent a while googling how to set the 
+        // Add color and icon capabilities to the cell renderer. Spent a while googling how to set the 
         // foreground color of a cell but nothing came up. Fell back to reading the swing source
         // and finding a suitable hack.
         DefaultTableCellRenderer coloredrenderer = new DefaultTableCellRenderer() {
@@ -101,6 +117,11 @@ public class TabBody extends javax.swing.JPanel {
                     elem.setForeground(info.color);
                    this.setText(info.string);
                }
+               else if (value instanceof IconString) {
+                   IconString info = (IconString) value;
+                   this.setIcon(info.icon);
+                   this.setText(info.string);
+               }
                
                return elem;
              }
@@ -112,7 +133,7 @@ public class TabBody extends javax.swing.JPanel {
 
                 },
                 new String [] {
-                    "Player", "ID", "IP", "HWID"
+                    "ID", "Player", "IP", "HWID"
                 }
             ) {
                 @Override
@@ -151,9 +172,15 @@ public class TabBody extends javax.swing.JPanel {
         PlayerTable.setBackground(Color.white);
  
         // This must be called after the model set
-        if (type == ServerType.SOLDAT)
+        if (type == ServerType.SOLDAT) {
+            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(coloredrenderer);
             PlayerTable.getColumnModel().getColumn(2).setCellRenderer(coloredrenderer);
-        
+            PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
+        }
+        else if (type == ServerType.KAG) {
+            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(coloredrenderer);
+            PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
+        }
     }
 
     public ServerType getType() {
@@ -177,7 +204,7 @@ public class TabBody extends javax.swing.JPanel {
         CommandBox = new javax.swing.JTextField();
         CommandButton = new javax.swing.JButton();
         jSplitPane1 = new javax.swing.JSplitPane();
-        jScrollPane2 = new javax.swing.JScrollPane();
+        ConsoleLogPane = new javax.swing.JScrollPane();
         ConsoleLog = new javax.swing.JTextPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         PlayerTable = new javax.swing.JTable();
@@ -223,9 +250,9 @@ public class TabBody extends javax.swing.JPanel {
 
         ConsoleLog.setEditable(false);
         ConsoleLog.setMinimumSize(new java.awt.Dimension(0, 100));
-        jScrollPane2.setViewportView(ConsoleLog);
+        ConsoleLogPane.setViewportView(ConsoleLog);
 
-        jSplitPane1.setBottomComponent(jScrollPane2);
+        jSplitPane1.setBottomComponent(ConsoleLogPane);
 
         jScrollPane1.setMinimumSize(new java.awt.Dimension(23, 100));
 
@@ -237,6 +264,8 @@ public class TabBody extends javax.swing.JPanel {
 
             }
         ));
+        PlayerTable.setShowGrid(false);
+        PlayerTable.setSurrendersFocusOnKeystroke(true);
         PlayerTable.getTableHeader().setReorderingAllowed(false);
         jScrollPane1.setViewportView(PlayerTable);
 
@@ -609,9 +638,10 @@ public class TabBody extends javax.swing.JPanel {
     public void drawKagPlayers(List<KagPlayer> players) {
         PlayerModel.setRowCount(0);
         for (KagPlayer player : players) {
+            Icon country = Icons.ipCountryIcon(player.ip);
             PlayerModel.addRow(new Object[]{
-                player.name,
                 player.id,
+                country != null ? new IconString(country, player.name) : player.name,
                 player.ip,
                 player.hwid
             });
@@ -627,10 +657,11 @@ public class TabBody extends javax.swing.JPanel {
             ColorString team = new ColorString();
             team.color = SoldatServer.teamIdToColor[player.team];
             team.string = SoldatServer.teamIdToString[player.team];
+            Icon country = Icons.ipCountryIcon(player.ip);
             
             PlayerModel.addRow(new Object[] {
                 player.id,
-                player.name,
+                country != null ? new IconString(country, player.name) : player.name,
                 team, 
                 player.kills,
                 player.deaths,
@@ -651,6 +682,7 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JButton CommandButton;
     private javax.swing.JButton ConnectButton;
     private javax.swing.JTextPane ConsoleLog;
+    private javax.swing.JScrollPane ConsoleLogPane;
     private javax.swing.JLabel GameTypeLabel;
     private javax.swing.JTextField HostBox;
     private javax.swing.JLabel MapNameLabel;
@@ -660,7 +692,6 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables

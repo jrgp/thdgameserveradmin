@@ -37,6 +37,9 @@ public class MainWindow extends javax.swing.JFrame {
         
         addKagButton.setIcon(Icons.getIcon(ServerType.KAG));
         addSoldatButton.setIcon(Icons.getIcon(ServerType.SOLDAT));
+        
+        IpCountry.Load();
+        Conf.load();
     }
 
     /**

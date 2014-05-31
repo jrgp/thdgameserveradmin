@@ -70,4 +70,10 @@
     nbproject/build-impl.xml file. 
 
     -->
+
+<target name="-post-jar">
+   <copy todir="${dist.jar.dir}/res">
+       <fileset dir="res" includes="**"/>
+   </copy>        
+</target>
 </project>

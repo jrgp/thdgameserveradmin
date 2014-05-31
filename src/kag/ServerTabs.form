@@ -68,6 +68,9 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Add Soldat Tab"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addSoldatButtonActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

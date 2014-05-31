@@ -36,7 +36,7 @@ import javax.swing.text.StyledDocument;
  * @author joe
  */
 public class TabBody extends javax.swing.JPanel {
-    private KagSocket Server = null;
+    private ServerInstance Server = null;
     private boolean Connected = false;
     
     private final DefaultTableModel PlayerModel;
@@ -49,15 +49,17 @@ public class TabBody extends javax.swing.JPanel {
     
     /**
      * Creates new form TabBody
+     * @param type
+     * @param tabController
      */
     public TabBody(ServerType type, ServerTabs tabController) {
         this.type = type;
         this.tabController = tabController;
         
-        if (type == type.KAG) {
+        if (type == ServerType.KAG) {
             KagRegexes.init();
         }
-        else if (type == type.SOLDAT) {
+        else if (type == ServerType.SOLDAT) {
             SoldatRegexes.init();
         }
         
@@ -81,10 +83,12 @@ public class TabBody extends javax.swing.JPanel {
                 false, false, false, false
             };
 
+            @Override
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
             }
 
+            @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
             }
@@ -294,7 +298,14 @@ public class TabBody extends javax.swing.JPanel {
         
         hostString = IpPort;
         
-        Server = new KagSocket(this);
+        if (this.type == ServerType.KAG)
+            Server = new KagSocket();
+        else if (this.type == ServerType.SOLDAT)
+            Server = new SoldatSocket();
+        else 
+            return;
+        
+        Server.setWindow(this);
         
         Server.setDetails(Host, Password, Port);
         Server.execute();
@@ -432,14 +443,14 @@ public class TabBody extends javax.swing.JPanel {
                 StyleConstants.setForeground(style, Color.GRAY);
                 words.add(new StyledText(style, match.group(2)));
             }
-            
-            // something our regexen didn't pickup... gray that fucker out
-            else {
-                style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.GRAY);
-                words.add(new StyledText(style, line));
-            }
+        }      
+        // something our regexen didn't pickup... gray that fucker out
+        else {
+          style = new SimpleAttributeSet();
+          StyleConstants.setForeground(style, Color.GRAY);
+          words.add(new StyledText(style, line));
         }
+
         
         words.add(new StyledText(null, "\n"));
         

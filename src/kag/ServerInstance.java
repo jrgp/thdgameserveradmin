@@ -18,17 +18,18 @@
 
 package kag;
 
-import java.util.regex.Pattern;
-
 /**
  *
  * @author joe
  */
-public class SoldatRegexes {
+public interface ServerInstance {
+    public void Connect();
+    public void setDetails(String Host, String Password, Integer Port);
+    public void setWindow(TabBody Window);
+    public void Disconnect();
+    public void sendCommand(String line);
     
-    public static Pattern lineServerVersion;
-    
-    public static void init() {
-        lineServerVersion = Pattern.compile("^Server Version: ([\\d\\.]+)");
-    }
+    // from swingworker
+    public void execute();
+    public boolean cancel(boolean doit);
 }

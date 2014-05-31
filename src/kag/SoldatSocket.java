@@ -20,14 +20,42 @@ package kag;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
+
+class SoldatNotif {
+
+    public String Type = "";
+    public String Line = "";
+    public String Event = "";
+    
+    public SoldatNotif() {
+    }
+    
+    public static SoldatNotif lineFactory(String Line) {
+        SoldatNotif notif = new SoldatNotif();
+        notif.Line = Line;
+        notif.Type = "line";
+        return notif;
+    }
+    public static SoldatNotif eventFactory(String Event) {
+        SoldatNotif notif = new SoldatNotif();
+        notif.Event = Event;
+        notif.Type = "event";
+        return notif;
+    }
+}
 
 /**
  *
  * @author joe
  */
-public class SoldatSocket extends SwingWorker<Void, KagNotif> {
+public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements ServerInstance {
     
     private Socket Sock = null;
     private BufferedReader In = null;
@@ -40,13 +68,236 @@ public class SoldatSocket extends SwingWorker<Void, KagNotif> {
     
     public Boolean Connected = false;
     
-    public SoldatSocket (TabBody Window) {
-        this.Window = Window;
+    private String ServerVersion = null;
+    
+    
+    public SoldatSocket () {
         KagRegexes.init();
     }
 
+
+    @Override
+    public void Connect () {
+        
+        System.out.println(String.format("Connecting to %s:%d with %s", Host, Port, Password));
+        
+        Connected = false;
+        
+        try {
+            Sock = new Socket(Host, Port);
+            In = new BufferedReader(new InputStreamReader(Sock.getInputStream(), "ISO-8859-1"));
+            Out = new DataOutputStream(Sock.getOutputStream());
+            Out.writeBytes(Password+"\n");
+        }
+        catch (IOException e) {
+            Connected = false;
+        }
+    }
+    
+    @Override
+    public void sendCommand(String line) {
+        if (!Connected) {
+            System.out.println("Cannot write if we're not connected");
+            return;
+        }
+        try {
+            Out.writeBytes(line+"\n");
+            System.out.println("wrote "+line);
+        }
+        catch (IOException e) {
+            System.out.println("Failed writing");
+        }
+    }
+    
+    @Override
+    public void setDetails(String Host, String Password, Integer Port) {
+        this.Host = Host;
+        this.Password = Password;
+        this.Port = Port;
+    }
+
+    @Override
+    public void setWindow(TabBody Window) {
+        this.Window = Window;
+    }
+
+    @Override
+    public void Disconnect() {
+        System.out.println("Disconnecting");
+        try {
+            Sock.close();
+            In.close();
+            Out.close();
+        }
+        catch (IOException e) {
+        } 
+        Connected = false;
+        publish(SoldatNotif.eventFactory("Disconnected"));
+    }
+
+    
     @Override
     protected Void doInBackground() throws Exception {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        System.out.println("in background");
+        
+        if (Connected) {
+            System.out.println("Already connected?");
+            return null;
+        }
+        
+        Connect();
+        
+        String line;
+        
+        Matcher match;
+        
+        char[] refresh = new char[1188];
+        
+        int i;
+        
+        try {
+            for (i = 0; ;i++) {
+                
+                // Only way we can watch for this thread being killed (user clicking disconnect)
+                // is if we çheck the result of this method call often
+                if (Thread.interrupted()) {
+                    System.out.println("got interrupt");
+                    throw new InterruptedException();
+                }
+
+                // With java there is no way of detecting when a socket closes on the remote end except
+                // to see if writing fails.
+                if (i % 100 == 0) {
+                    System.out.println("Sending REFRESH to see if writing fails which means we're disconnected");
+                    Out.writeBytes("REFRESH\n");
+                    Out.flush();
+                }
+
+                // We don't want to block on waiting for input in case the interrupt is triggered
+                // and we're waiting for a line from the server before we can notice
+                if (!In.ready()) {
+                    Thread.sleep(100);
+                    continue;
+                }
+                
+                if ((line = In.readLine()) == null)
+                    break;
+
+                if (line.equals("REFRESH")) {
+                    System.out.println("I am expecting refresh packet...");
+                    try {
+                       System.out.println("Got bytes for refresh: "+In.read(refresh, 0, 1188));
+                       parseRefresh(refresh);
+                    }
+                    catch (Exception e) {
+                        System.out.println("failed shit: "+e);
+                    }
+                    continue; 
+                }
+                else {
+                    System.out.println("not expecting refresh");
+                }
+                
+                if (!Connected) {
+                    Connected = true;
+                    publish(SoldatNotif.eventFactory("Connected"));
+                }
+                    
+                if (ServerVersion == null && (match = SoldatRegexes.lineServerVersion.matcher(line)) != null && match.find()) {
+                    ServerVersion = match.group(1);
+                }
+                
+                System.out.println("Received line via while: '"+line+"'");
+                line = line.trim();
+
+                publish(SoldatNotif.lineFactory(line));
+            }
+        }
+        catch (IOException e) {
+            
+        }
+        catch (InterruptedException e) {
+            System.out.println("Disconnecting via interrupt");
+        }
+        finally  {
+            Disconnect();
+        }
+        return null;
     }
+    
+    @Override
+    protected void process(List<SoldatNotif> messages) {
+        
+        for (SoldatNotif notif : messages) {
+            if (notif.Type.equals("line")) {
+                System.out.println("Recieved line via process: "+notif.Line);
+                Window.addConsoleLine(notif.Line, "console");
+            }
+            else if (notif.Type.equals("event") && notif.Event.equals("Disconnected")) {
+                Window.onDisconnect();
+            }
+            else if (notif.Type.equals("event") && notif.Event.equals("Connected")) {
+                Window.onConnect();
+            }
+       }
+    }
+
+    private void parseRefresh(char[] refresh) {
+
+        int i, j;
+        int pos = 0;
+        
+        //SoldatPlayer players[32]  = null;
+        ArrayList<SoldatPlayer> players = null;
+        
+       // SoldatPlayer player;
+        
+        // player names
+      /*  for (i = 0; i < 32; i++) {
+            players[i] = new SoldatPlayer();break;
+            int length = refresh[pos];
+            pos++;
+            for (j = 0; j < length; j++) {
+                players[i].name += refresh[pos];
+                pos++;
+            }
+            System.out.println("Player: "+players[i].name);
+            pos += 24 - length;
+            break;
+        }*/
+    
+        // player teams
+        for (i = 0; i < 32; i++) {
+            
+        }
+        
+        // player kills
+        for (i = 0; i < 32; i++) {
+            
+        }
+        
+        // player deaths
+        for (i = 0; i < 32; i++) {
+            
+        }
+        
+        // Get player pings
+	for (i = 0; i < 32; i++) {
+	//	recv($handle, $sbuff, 1, '');
+	//	$players[$i]->{'ping'} = unpack('C', $sbuff);
+	}
+ 
+	// Get player IDs
+	for (i = 0; i < 32; i++) {
+		//recv($handle, $sbuff, 1, '');
+	//	$players[$i]->{'id'} = unpack('C', $sbuff);
+	}
+ 
+	// Get player IPs
+	for (i = 0; i < 32; i++) {
+		//recv($handle, $sbuff, 4, '');
+	//	$players[$i]->{'ip'} = join('.', unpack('CCCC', $sbuff));
+	}        
+    }
+    
 }

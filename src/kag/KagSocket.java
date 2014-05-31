@@ -53,7 +53,7 @@ class KagNotif {
  *
  * @author joe
  */
-public class KagSocket extends SwingWorker<Void, KagNotif> {
+public class KagSocket extends SwingWorker<Void, KagNotif> implements ServerInstance {
     
     private Socket Sock = null;
     private BufferedReader In = null;
@@ -66,11 +66,17 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
     
     public Boolean Connected = false;
     
-    public KagSocket (TabBody Window) {
-        this.Window = Window;
+    public KagSocket () {
         KagRegexes.init();
     }
     
+    
+    @Override
+    public void setWindow(TabBody Window) {
+        this.Window = Window;
+    };
+    
+    @Override
     public void setDetails(String Host, String Password, Integer Port) {
         this.Host = Host;
         this.Password = Password;
@@ -94,6 +100,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
         }
     }
     
+    @Override
     public void Disconnect() {
         System.out.println("Disconnecting");
         try {
@@ -107,6 +114,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> {
         publish(KagNotif.eventFactory("Disconnected"));
     }
 
+    @Override
     public void sendCommand(String line) {
         if (!Connected) {
             System.out.println("Cannot write if we're not connected");

@@ -18,17 +18,15 @@
 
 package kag;
 
-import java.util.regex.Pattern;
-
 /**
  *
  * @author joe
  */
-public class SoldatRegexes {
+public class SoldatPlayer {
+    public String name;
+    public Integer id;
+    public String hwid;
+    public String ip;
     
-    public static Pattern lineServerVersion;
-    
-    public static void init() {
-        lineServerVersion = Pattern.compile("^Server Version: ([\\d\\.]+)");
-    }
+
 }

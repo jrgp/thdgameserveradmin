@@ -63,6 +63,11 @@ public class ServerTabs extends javax.swing.JFrame {
         });
 
         addSoldatButton.setText("Add Soldat Tab");
+        addSoldatButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addSoldatButtonActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -94,11 +99,15 @@ public class ServerTabs extends javax.swing.JFrame {
     private void addKagButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addKagButtonActionPerformed
         ServerType type = ServerType.KAG;
         TabBody tab = new TabBody(type, this);
-        
         Tabs.addTab("Server", tab);
-        
         fixTabs();
     }//GEN-LAST:event_addKagButtonActionPerformed
+
+    private void addSoldatButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addSoldatButtonActionPerformed
+        ServerType type = ServerType.SOLDAT;
+        TabBody tab = new TabBody(type, this);
+        Tabs.addTab("Server", tab);
+        fixTabs();    }//GEN-LAST:event_addSoldatButtonActionPerformed
 
     public void fixTabs() {
         int tabcount = Tabs.getTabCount();

@@ -103,7 +103,7 @@ public class TabBody extends javax.swing.JPanel {
         // Add color and icon capabilities to the cell renderer. Spent a while googling how to set the 
         // foreground color of a cell but nothing came up. Fell back to reading the swing source
         // and finding a suitable hack.
-        DefaultTableCellRenderer coloredrenderer = new DefaultTableCellRenderer() {
+        class coloredrenderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
                                                             boolean isSelected, boolean hasFocus, 
@@ -173,12 +173,12 @@ public class TabBody extends javax.swing.JPanel {
  
         // This must be called after the model set
         if (type == ServerType.SOLDAT) {
-            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(coloredrenderer);
-            PlayerTable.getColumnModel().getColumn(2).setCellRenderer(coloredrenderer);
+            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
+            PlayerTable.getColumnModel().getColumn(2).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
         else if (type == ServerType.KAG) {
-            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(coloredrenderer);
+            PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
     }

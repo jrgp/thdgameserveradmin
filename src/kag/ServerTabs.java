@@ -35,8 +35,8 @@ public class ServerTabs extends javax.swing.JFrame {
     public ServerTabs() {
         initComponents();
         
-        addKagButton.setIcon(TabUtils.getIcon(ServerType.KAG));
-        addSoldatButton.setIcon(TabUtils.getIcon(ServerType.SOLDAT));
+        addKagButton.setIcon(Icons.getIcon(ServerType.KAG));
+        addSoldatButton.setIcon(Icons.getIcon(ServerType.SOLDAT));
     }
 
     /**

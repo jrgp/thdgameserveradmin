@@ -68,12 +68,28 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
     public Boolean Connected = false;
     
     private String ServerVersion = null;
-    
+
+    public static String gameModeIdToString[] = {
+        "Deathmatch",
+        "Pointmatch",
+        "Team Deathmatch",
+        "Capture the Flag",
+        "Rambomatch",
+        "Infiltration",
+        "Hold the Flag"
+    };
+
+    public static String teamIdToString[] = {
+        "None",
+        "Alpha",
+        "Bravo",
+        "Charlie",
+        "Delta"
+    };
     
     public SoldatSocket () {
         KagRegexes.init();
     }
-
 
     @Override
     public void Connect () {

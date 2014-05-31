@@ -31,6 +31,4 @@ public class SoldatPlayer {
     public long  kills;
     public long deaths;
     public int ping;
-    
-
 }

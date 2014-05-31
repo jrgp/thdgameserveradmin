@@ -35,42 +35,11 @@ import javax.swing.JPanel;
  * @author joe
  */
 public class TabUtils {
-   // private static final String kagIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/kag_icon.png";
-  //  private static final String SoldatIconPath = "/Users/joe/NetBeansProjects/kagadmin/pics/soldat_icon.png";
 
-    private static final String kagIconPath = "kag_icon.png";
-    private static final String SoldatIconPath = "soldat_icon.png";
-    
-    private static ImageIcon kagIcon = null;
-    private static ImageIcon soldatIcon = null;
-    
-    public static Icon getIcon(ServerType type) {
-        
-        Icon icon = null;
-
-        try {
-            if (type == type.KAG) {
-                if (kagIcon == null)
-                    kagIcon = new ImageIcon(ClassLoader.getSystemResource(kagIconPath));
-                icon = kagIcon;
-            }
-            else if (type == type.SOLDAT) {
-                if (soldatIcon == null)
-                    soldatIcon = new ImageIcon(ClassLoader.getSystemResource(SoldatIconPath));
-                icon = soldatIcon;
-            }
-        } 
-        catch (Exception e) {
-            return null;
-        }
-        
-        return icon;
-    }
-    
     public static Component getTabLabel(ServerType type, String title, ServerTabs tabs, TabBody tab) {
         JLabel label = new JLabel(title);
         label.setHorizontalTextPosition(JLabel.TRAILING);
-        label.setIcon(getIcon(type));
+        label.setIcon(Icons.getIcon(type));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
         
         //JButton closeButton = new JButton(MetalIconFactory.getInternalFrameCloseIcon(16));
@@ -104,7 +73,6 @@ public class TabUtils {
         tabComponent.setOpaque(false);
         tabComponent.add(label, BorderLayout.WEST);
         tabComponent.add(closeButton, BorderLayout.EAST);
-
         
         return (Component) tabComponent;
     }

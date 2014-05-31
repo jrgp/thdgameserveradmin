@@ -5,10 +5,10 @@ import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.DefaultCaret;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
@@ -77,21 +77,14 @@ public class TabBody extends javax.swing.JPanel {
                     "Player", "ID", "IP", "HWID"
                 }
             ) {
-                Class[] types = new Class [] {
-                    java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
-                };
-                boolean[] canEdit = new boolean [] {
-                    false, false, false, false
-                };
-
                 @Override
                 public Class getColumnClass(int columnIndex) {
-                    return types [columnIndex];
+                    return getValueAt(0, columnIndex).getClass();
                 }
 
                 @Override
                 public boolean isCellEditable(int rowIndex, int columnIndex) {
-                    return canEdit [columnIndex];
+                    return false;
                 }
             };
         }
@@ -101,28 +94,17 @@ public class TabBody extends javax.swing.JPanel {
 
                 },
                 new String [] {
-                    "ID", "Player", "Kills", "Deaths", "IP"
+                    "ID", "Player", "Team", "Kills", "Deaths", "IP"
                 }
             ) {
-                Class[] types = new Class [] {
-                    java.lang.Integer.class,
-                    java.lang.String.class,
-                    java.lang.Integer.class,
-                    java.lang.Integer.class,
-                    java.lang.String.class
-                };
-                boolean[] canEdit = new boolean [] {
-                    false, false, false, false
-                };
-
                 @Override
                 public Class getColumnClass(int columnIndex) {
-                    return types [columnIndex];
+                    return getValueAt(0, columnIndex).getClass();
                 }
 
                 @Override
                 public boolean isCellEditable(int rowIndex, int columnIndex) {
-                    return canEdit [columnIndex];
+                    return false;
                 }
             };           
         }
@@ -540,12 +522,14 @@ public class TabBody extends javax.swing.JPanel {
         for (SoldatPlayer player : players) {
             if (player.name.length() == 0)
                 continue;
+           
             PlayerModel.addRow(new Object[] {
                 player.id,
                 player.name,
+                SoldatSocket.teamIdToString[player.team],
                 player.kills,
                 player.deaths,
-                player.ip
+                player.ip.equals("0.0.0.0") ? Icons.getBotIcon() : player.ip
             });
         }
     } 

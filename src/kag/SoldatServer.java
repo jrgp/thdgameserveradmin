@@ -366,6 +366,7 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         gametype = refresh[pos];
         
         Window.drawSoldatPlayers(players);
+        Window.updateSoldatGameInfo(mapname, gameModeIdToString[gametype], timelimit - currenttime, ServerVersion);
     }
     
 }

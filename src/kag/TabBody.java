@@ -52,17 +52,23 @@ public class TabBody extends javax.swing.JPanel {
     
     private String hostString = "";
     
-    private ServerTabs tabController;
+    private MainWindow tabController;
     
     /**
      * Creates new form TabBody
      * @param type
      * @param tabController
      */
-    public TabBody(ServerType type, ServerTabs tabController) {
+    public TabBody(ServerType type, MainWindow tabController) {
         this.type = type;
         this.tabController = tabController;
         
+        initComponents();
+        
+        // This gets visible for Soldat. Not for kag as i dont have enough 
+        // info to show
+        BottomInfoPanel.setVisible(false);
+         
         if (type == ServerType.KAG) {
             KagRegexes.init();
         }
@@ -72,7 +78,7 @@ public class TabBody extends javax.swing.JPanel {
         
         Conf.load();
         
-        initComponents();
+       
 
       //  DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
      //   caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -175,6 +181,11 @@ public class TabBody extends javax.swing.JPanel {
         ConsoleLog = new javax.swing.JTextPane();
         jScrollPane1 = new javax.swing.JScrollPane();
         PlayerTable = new javax.swing.JTable();
+        BottomInfoPanel = new javax.swing.JPanel();
+        GameTypeLabel = new javax.swing.JLabel();
+        jSeparator1 = new javax.swing.JSeparator();
+        MapNameLabel = new javax.swing.JLabel();
+        VersionLabel = new javax.swing.JLabel();
 
         jLabel1.setText("IP:port");
 
@@ -193,6 +204,7 @@ public class TabBody extends javax.swing.JPanel {
             }
         });
 
+        CommandBox.setEditable(false);
         CommandBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CommandBoxActionPerformed(evt);
@@ -200,6 +212,7 @@ public class TabBody extends javax.swing.JPanel {
         });
 
         CommandButton.setText("Run");
+        CommandButton.setEnabled(false);
         CommandButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CommandButtonActionPerformed(evt);
@@ -229,14 +242,51 @@ public class TabBody extends javax.swing.JPanel {
 
         jSplitPane1.setLeftComponent(jScrollPane1);
 
+        GameTypeLabel.setText("GameType");
+
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+
+        MapNameLabel.setText("Map");
+
+        VersionLabel.setText("Version");
+
+        javax.swing.GroupLayout BottomInfoPanelLayout = new javax.swing.GroupLayout(BottomInfoPanel);
+        BottomInfoPanel.setLayout(BottomInfoPanelLayout);
+        BottomInfoPanelLayout.setHorizontalGroup(
+            BottomInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BottomInfoPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(GameTypeLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(MapNameLabel)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(VersionLabel)
+                .addContainerGap())
+        );
+        BottomInfoPanelLayout.setVerticalGroup(
+            BottomInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(BottomInfoPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(BottomInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jSeparator1)
+                    .addComponent(GameTypeLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(BottomInfoPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(MapNameLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(VersionLabel)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jSplitPane1)
+            .addComponent(BottomInfoPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jSplitPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -247,7 +297,7 @@ public class TabBody extends javax.swing.JPanel {
                         .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 236, Short.MAX_VALUE))
+                        .addGap(0, 252, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -264,13 +314,14 @@ public class TabBody extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton))
-                .addGap(18, 18, 18)
-                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(CommandBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CommandButton))
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(BottomInfoPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -536,6 +587,8 @@ public class TabBody extends javax.swing.JPanel {
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
         tabController.fixTabs();
+        if (type == ServerType.SOLDAT)
+            BottomInfoPanel.setVisible(true);
     }
 
     public void onDisconnect() {
@@ -550,6 +603,7 @@ public class TabBody extends javax.swing.JPanel {
         addConsoleLine("Disconnected..", "disconnect");
         PlayerModel.setRowCount(0);
         tabController.fixTabs();
+        BottomInfoPanel.setVisible(false);
     }
     
     public void drawKagPlayers(List<KagPlayer> players) {
@@ -585,18 +639,29 @@ public class TabBody extends javax.swing.JPanel {
         }
     } 
     
+    public void updateSoldatGameInfo(String map, String gametype, long timeleft, String version) {
+        GameTypeLabel.setText(gametype);
+        MapNameLabel.setText(map);
+        VersionLabel.setText(version);
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel BottomInfoPanel;
     private javax.swing.JTextField CommandBox;
     private javax.swing.JButton CommandButton;
     private javax.swing.JButton ConnectButton;
     private javax.swing.JTextPane ConsoleLog;
+    private javax.swing.JLabel GameTypeLabel;
     private javax.swing.JTextField HostBox;
+    private javax.swing.JLabel MapNameLabel;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
+    private javax.swing.JLabel VersionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }

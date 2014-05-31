@@ -35,7 +35,7 @@ import javax.swing.JPanel;
  */
 public class TabUtils {
 
-    public static Component getTabLabel(ServerType type, String title, ServerTabs tabs, TabBody tab) {
+    public static Component getTabLabel(ServerType type, String title, MainWindow tabs, TabBody tab) {
         JLabel label = new JLabel(title);
         label.setHorizontalTextPosition(JLabel.TRAILING);
         label.setIcon(Icons.getIcon(type));

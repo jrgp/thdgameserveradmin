@@ -139,14 +139,15 @@ public class TabBody extends javax.swing.JPanel {
                     return false;
                 }
             };   
-            
         }
         
         PlayerTable.setModel(PlayerModel);
+        PlayerTable.setBackground(Color.white);
  
         // This must be called after the model set
         if (type == ServerType.SOLDAT)
             PlayerTable.getColumnModel().getColumn(2).setCellRenderer(coloredrenderer);
+        
     }
 
     public ServerType getType() {
@@ -167,12 +168,13 @@ public class TabBody extends javax.swing.JPanel {
         jLabel2 = new javax.swing.JLabel();
         PasswordBox = new javax.swing.JPasswordField();
         ConnectButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        PlayerTable = new javax.swing.JTable();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        ConsoleLog = new javax.swing.JTextPane();
         CommandBox = new javax.swing.JTextField();
         CommandButton = new javax.swing.JButton();
+        jSplitPane1 = new javax.swing.JSplitPane();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        ConsoleLog = new javax.swing.JTextPane();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        PlayerTable = new javax.swing.JTable();
 
         jLabel1.setText("IP:port");
 
@@ -191,20 +193,6 @@ public class TabBody extends javax.swing.JPanel {
             }
         });
 
-        PlayerTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-
-            },
-            new String [] {
-
-            }
-        ));
-        PlayerTable.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(PlayerTable);
-
-        ConsoleLog.setEditable(false);
-        jScrollPane2.setViewportView(ConsoleLog);
-
         CommandBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 CommandBoxActionPerformed(evt);
@@ -218,15 +206,37 @@ public class TabBody extends javax.swing.JPanel {
             }
         });
 
+        jSplitPane1.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
+
+        ConsoleLog.setEditable(false);
+        ConsoleLog.setMinimumSize(new java.awt.Dimension(0, 100));
+        jScrollPane2.setViewportView(ConsoleLog);
+
+        jSplitPane1.setBottomComponent(jScrollPane2);
+
+        jScrollPane1.setMinimumSize(new java.awt.Dimension(23, 100));
+
+        PlayerTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        PlayerTable.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(PlayerTable);
+
+        jSplitPane1.setLeftComponent(jScrollPane1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jSplitPane1)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2)
-                    .addComponent(jScrollPane1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -237,7 +247,7 @@ public class TabBody extends javax.swing.JPanel {
                         .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 94, Short.MAX_VALUE))
+                        .addGap(0, 236, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -254,13 +264,11 @@ public class TabBody extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 203, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
+                .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 399, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(CommandBox, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(CommandBox, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(CommandButton))
                 .addContainerGap())
         );
@@ -589,5 +597,6 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JSplitPane jSplitPane1;
     // End of variables declaration//GEN-END:variables
 }

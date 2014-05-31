@@ -55,7 +55,7 @@ class SoldatNotif {
  *
  * @author joe
  */
-public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements ServerInstance {
+public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements ServerInstance {
     
     private Socket Sock = null;
     private BufferedReader In = null;
@@ -70,7 +70,7 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
     
     private String ServerVersion = null;
 
-    public static String gameModeIdToString[] = {
+    public final static String gameModeIdToString[] = {
         "Deathmatch",
         "Pointmatch",
         "Team Deathmatch",
@@ -80,7 +80,7 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
         "Hold the Flag"
     };
 
-    public static String teamIdToString[] = {
+    public final static String teamIdToString[] = {
         "None",
         "Alpha",
         "Bravo",
@@ -88,7 +88,7 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
         "Delta"
     };
     
-    public static Color teamIdToColor[] = {
+    public final static Color teamIdToColor[] = {
         Color.DARK_GRAY,
         Color.RED,
         Color.BLUE,
@@ -96,7 +96,7 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
         Color.GREEN
     };
     
-    public SoldatSocket () {
+    public SoldatServer () {
         KagRegexes.init();
     }
 
@@ -276,11 +276,9 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
         long [] teamscore = new long[4];
         
         String mapname = "";
-        
         long timelimit = 0;
         long currenttime = 0;
         long killlimit = 0;
-        
         int gametype;
         
         // player names

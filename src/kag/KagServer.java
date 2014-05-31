@@ -53,7 +53,7 @@ class KagNotif {
  *
  * @author joe
  */
-public class KagSocket extends SwingWorker<Void, KagNotif> implements ServerInstance {
+public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInstance {
     
     private Socket Sock = null;
     private BufferedReader In = null;
@@ -66,7 +66,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> implements ServerInst
     
     public Boolean Connected = false;
     
-    public KagSocket () {
+    public KagServer () {
         KagRegexes.init();
     }
     

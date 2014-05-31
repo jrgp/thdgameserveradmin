@@ -4,21 +4,16 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
-import javax.swing.border.Border;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableColumn;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
-import sun.swing.DefaultLookup;
 
 /*
  * Copyright (C) 2014 joe
@@ -74,6 +69,8 @@ public class TabBody extends javax.swing.JPanel {
         else if (type == ServerType.SOLDAT) {
             SoldatRegexes.init();
         }
+        
+        Conf.load();
         
         initComponents();
 
@@ -353,9 +350,9 @@ public class TabBody extends javax.swing.JPanel {
         hostString = IpPort;
         
         if (this.type == ServerType.KAG)
-            Server = new KagSocket();
+            Server = new KagServer();
         else if (this.type == ServerType.SOLDAT)
-            Server = new SoldatSocket();
+            Server = new SoldatServer();
         else 
             return;
         
@@ -407,13 +404,13 @@ public class TabBody extends javax.swing.JPanel {
         
         if (type.equals("connect")) {
             style = new SimpleAttributeSet();
-            StyleConstants.setForeground(style, Color.GREEN);
+            StyleConstants.setForeground(style, Conf.getColor("consolelog.connected")); 
             StyleConstants.setBold(style, true);
             words.add(new StyledText(style, line));
         }
         else if (type.equals("disconnect")) {
             style = new SimpleAttributeSet();
-            StyleConstants.setForeground(style, Color.RED);
+            StyleConstants.setForeground(style, Conf.getColor("consolelog.disconnected")); 
             StyleConstants.setBold(style, true);
             words.add(new StyledText(style, line));
         }
@@ -422,13 +419,13 @@ public class TabBody extends javax.swing.JPanel {
             if ((match = KagRegexes.lineRconConnect.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Color.darkGray);
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
                 words.add(new StyledText(style, match.group(1)));
                 
                 words.add(new StyledText(null, " TCP RCON Connection from "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconauthip")); 
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
                 
@@ -437,20 +434,20 @@ public class TabBody extends javax.swing.JPanel {
             else if ((match = KagRegexes.linePlayerSpeak.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Color.darkGray);
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
                 words.add(new StyledText(style, match.group(1)));
                 
                 words.add(new StyledText(null, " "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeaknick")); 
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
                 
                 words.add(new StyledText(null, " "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.GRAY);
+                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeakmessage")); 
                 words.add(new StyledText(style, match.group(3)));                
             }
             else if ((match = KagRegexes.lineRconCommand.matcher(line)) != null && match.find()) {
@@ -462,20 +459,20 @@ public class TabBody extends javax.swing.JPanel {
                 
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Color.darkGray);
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
                 words.add(new StyledText(style, match.group(1)));
                 
                 words.add(new StyledText(null, " RCON command from "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmdsrc")); 
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
                 
                 words.add(new StyledText(null, ": "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.BLACK);
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmd")); 
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(3)));                
             }
@@ -488,28 +485,31 @@ public class TabBody extends javax.swing.JPanel {
                 
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Color.darkGray);
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
                 words.add(new StyledText(style, match.group(1)));
                 
                 words.add(new StyledText(null, " "));
                 
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Color.GRAY);
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.default")); 
                 words.add(new StyledText(style, match.group(2)));
             }
         }      
         // something our regexen didn't pickup... gray that fucker out
         else {
           style = new SimpleAttributeSet();
-          StyleConstants.setForeground(style, Color.GRAY);
+          StyleConstants.setForeground(style, Conf.getColor("consolelog.default"));
           words.add(new StyledText(style, line));
         }
 
-        
         words.add(new StyledText(null, "\n"));
         
         try {
             for (StyledText text : words) {
+           //     if (text.style == null) {
+        //            text.style = new SimpleAttributeSet();
+        //            StyleConstants.setForeground(text.style, Conf.getColor("consolelog.default"));
+         //       }
                 doc.insertString(doc.getLength(), text.text, text.style);
             }
         }
@@ -563,8 +563,8 @@ public class TabBody extends javax.swing.JPanel {
                 continue;
            
             ColorString team = new ColorString();
-            team.color = SoldatSocket.teamIdToColor[player.team];
-            team.string = SoldatSocket.teamIdToString[player.team];
+            team.color = SoldatServer.teamIdToColor[player.team];
+            team.string = SoldatServer.teamIdToString[player.team];
             
             PlayerModel.addRow(new Object[] {
                 player.id,

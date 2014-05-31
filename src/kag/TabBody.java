@@ -1,17 +1,24 @@
 package kag;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.border.Border;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
+import sun.swing.DefaultLookup;
 
 /*
  * Copyright (C) 2014 joe
@@ -30,6 +37,11 @@ import javax.swing.text.StyledDocument;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
+class ColorString {
+    String string;
+    Color color;
+}
 
 /**
  *
@@ -67,6 +79,29 @@ public class TabBody extends javax.swing.JPanel {
 
       //  DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
      //   caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+       
+        // Add color capabilities to the cell renderer. Spent a while googling how to set the 
+        // foreground color of a cell but nothing came up. Fell back to reading the swing source
+        // and finding a suitable hack.
+        DefaultTableCellRenderer coloredrenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value,
+                                                            boolean isSelected, boolean hasFocus, 
+                                                            int row, int column) {
+
+               Component elem = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+
+               if (value instanceof ColorString) {
+                   ColorString info = (ColorString) value;
+                   if (!isSelected)
+                    elem.setForeground(info.color);
+                   this.setText(info.string);
+               }
+               
+               return elem;
+             }
+        };        
         
         if (type == ServerType.KAG) {
             PlayerModel = new javax.swing.table.DefaultTableModel(
@@ -106,11 +141,15 @@ public class TabBody extends javax.swing.JPanel {
                 public boolean isCellEditable(int rowIndex, int columnIndex) {
                     return false;
                 }
-            };           
+            };   
+            
         }
         
         PlayerTable.setModel(PlayerModel);
-    
+ 
+        // This must be called after the model set
+        if (type == ServerType.SOLDAT)
+            PlayerTable.getColumnModel().getColumn(2).setCellRenderer(coloredrenderer);
     }
 
     public ServerType getType() {
@@ -523,10 +562,14 @@ public class TabBody extends javax.swing.JPanel {
             if (player.name.length() == 0)
                 continue;
            
+            ColorString team = new ColorString();
+            team.color = SoldatSocket.teamIdToColor[player.team];
+            team.string = SoldatSocket.teamIdToString[player.team];
+            
             PlayerModel.addRow(new Object[] {
                 player.id,
                 player.name,
-                SoldatSocket.teamIdToString[player.team],
+                team, 
                 player.kills,
                 player.deaths,
                 player.ip.equals("0.0.0.0") ? Icons.getBotIcon() : player.ip

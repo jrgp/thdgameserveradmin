@@ -18,6 +18,7 @@
 
 package kag;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -85,6 +86,14 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
         "Bravo",
         "Charlie",
         "Delta"
+    };
+    
+    public static Color teamIdToColor[] = {
+        Color.DARK_GRAY,
+        Color.RED,
+        Color.BLUE,
+        Color.YELLOW,
+        Color.GREEN
     };
     
     public SoldatSocket () {

@@ -19,13 +19,12 @@
 package kag;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -41,6 +40,7 @@ public class TabUtils {
         label.setHorizontalTextPosition(JLabel.TRAILING);
         label.setIcon(Icons.getIcon(type));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
+       //= label.setForeground(Color.DARKGREEN);
         
         //JButton closeButton = new JButton(MetalIconFactory.getInternalFrameCloseIcon(16));
         JButton closeButton = new JButton("X");
@@ -66,7 +66,6 @@ public class TabUtils {
 
             @Override
             public void mouseExited(MouseEvent e) {}
-
 	});
         
         JPanel tabComponent = new JPanel(new BorderLayout());

@@ -39,7 +39,7 @@ public class TabBody extends javax.swing.JPanel {
     private ServerInstance Server = null;
     private boolean Connected = false;
     
-    private final DefaultTableModel PlayerModel;
+    private DefaultTableModel PlayerModel = null;
     
     private ServerType type;
     
@@ -68,31 +68,64 @@ public class TabBody extends javax.swing.JPanel {
       //  DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
      //   caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         
-        PlayerModel = new javax.swing.table.DefaultTableModel(
-            new Object [][] {
+        if (type == ServerType.KAG) {
+            PlayerModel = new javax.swing.table.DefaultTableModel(
+                new Object [][] {
 
-            },
-            new String [] {
-                "Player", "ID", "IP", "HWID"
-            }
-        ) {
-            Class[] types = new Class [] {
-                java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                },
+                new String [] {
+                    "Player", "ID", "IP", "HWID"
+                }
+            ) {
+                Class[] types = new Class [] {
+                    java.lang.String.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class
+                };
+                boolean[] canEdit = new boolean [] {
+                    false, false, false, false
+                };
+
+                @Override
+                public Class getColumnClass(int columnIndex) {
+                    return types [columnIndex];
+                }
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit [columnIndex];
+                }
             };
-            boolean[] canEdit = new boolean [] {
-                false, false, false, false
-            };
+        }
+        else if (type == ServerType.SOLDAT) {
+             PlayerModel = new javax.swing.table.DefaultTableModel(
+                new Object [][] {
 
-            @Override
-            public Class getColumnClass(int columnIndex) {
-                return types [columnIndex];
-            }
+                },
+                new String [] {
+                    "ID", "Player", "Kills", "Deaths", "IP"
+                }
+            ) {
+                Class[] types = new Class [] {
+                    java.lang.Integer.class,
+                    java.lang.String.class,
+                    java.lang.Integer.class,
+                    java.lang.Integer.class,
+                    java.lang.String.class
+                };
+                boolean[] canEdit = new boolean [] {
+                    false, false, false, false
+                };
 
-            @Override
-            public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return canEdit [columnIndex];
-            }
-        };
+                @Override
+                public Class getColumnClass(int columnIndex) {
+                    return types [columnIndex];
+                }
+
+                @Override
+                public boolean isCellEditable(int rowIndex, int columnIndex) {
+                    return canEdit [columnIndex];
+                }
+            };           
+        }
         
         PlayerTable.setModel(PlayerModel);
     
@@ -262,7 +295,7 @@ public class TabBody extends javax.swing.JPanel {
     }   
     
     private void HandleConnect() {
-        String IpPort = HostBox.getText();
+        String IpPort = HostBox.getText().trim();
         String Password = new String(PasswordBox.getPassword());
         
         String Host;
@@ -486,11 +519,11 @@ public class TabBody extends javax.swing.JPanel {
         Connected = false;
         ConnectButton.setEnabled(true);
         addConsoleLine("Disconnected..", "disconnect");
-        drawPlayers(new ArrayList<>());
+        PlayerModel.setRowCount(0);
         tabController.fixTabs();
     }
     
-    public void drawPlayers(List<KagPlayer> players) {
+    public void drawKagPlayers(List<KagPlayer> players) {
         PlayerModel.setRowCount(0);
         for (KagPlayer player : players) {
             PlayerModel.addRow(new Object[]{
@@ -501,7 +534,21 @@ public class TabBody extends javax.swing.JPanel {
             });
         }
     }
-    
+ 
+    public void drawSoldatPlayers(SoldatPlayer[] players) {
+        PlayerModel.setRowCount(0);
+        for (SoldatPlayer player : players) {
+            if (player.name.length() == 0)
+                continue;
+            PlayerModel.addRow(new Object[] {
+                player.id,
+                player.name,
+                player.kills,
+                player.deaths,
+                player.ip
+            });
+        }
+    } 
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField CommandBox;

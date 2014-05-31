@@ -23,7 +23,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
@@ -246,58 +245,104 @@ public class SoldatSocket extends SwingWorker<Void, SoldatNotif> implements Serv
 
         int i, j;
         int pos = 0;
+       
+        SoldatPlayer[] players = new SoldatPlayer[32];
         
-        //SoldatPlayer players[32]  = null;
-        ArrayList<SoldatPlayer> players = null;
+        long [] teamscore = new long[4];
         
-       // SoldatPlayer player;
+        String mapname = "";
+        
+        long timelimit = 0;
+        long currenttime = 0;
+        long killlimit = 0;
+        
+        int gametype;
         
         // player names
-      /*  for (i = 0; i < 32; i++) {
-            players[i] = new SoldatPlayer();break;
+        for (i = 0; i < 32; i++) {
+            players[i] = new SoldatPlayer();
             int length = refresh[pos];
             pos++;
             for (j = 0; j < length; j++) {
                 players[i].name += refresh[pos];
                 pos++;
             }
-            System.out.println("Player: "+players[i].name);
             pos += 24 - length;
-            break;
-        }*/
+        }
     
         // player teams
         for (i = 0; i < 32; i++) {
-            
+            players[i].team = refresh[pos];
+            pos++;
         }
         
         // player kills
         for (i = 0; i < 32; i++) {
-            
+            players[i].kills = refresh[pos] + (refresh[pos + 1] * 256);
+            pos += 2;
         }
         
         // player deaths
         for (i = 0; i < 32; i++) {
-            
+            players[i].deaths = refresh[pos] + (refresh[pos + 1] * 256);
+            pos += 2;
         }
         
         // Get player pings
 	for (i = 0; i < 32; i++) {
-	//	recv($handle, $sbuff, 1, '');
-	//	$players[$i]->{'ping'} = unpack('C', $sbuff);
+            players[i].ping = refresh[pos];
+            pos++;
 	}
  
 	// Get player IDs
 	for (i = 0; i < 32; i++) {
-		//recv($handle, $sbuff, 1, '');
-	//	$players[$i]->{'id'} = unpack('C', $sbuff);
+            players[i].id = refresh[pos];
+            pos++;
 	}
  
 	// Get player IPs
 	for (i = 0; i < 32; i++) {
-		//recv($handle, $sbuff, 4, '');
-	//	$players[$i]->{'ip'} = join('.', unpack('CCCC', $sbuff));
+            int[] ips = new int[4];
+            for (j = 0; j < 4; j++) {
+                ips[j] = refresh[pos];
+                pos++;
+            }
+            players[i].ip = ips[0]+"."+ips[1]+"."+ips[2]+"."+ips[3];
 	}        
+        
+        // team scores
+        for (i = 0; i < 4; i++) {
+            teamscore[i] = refresh[pos] + (refresh[pos + 1] * 256);
+            pos += 2;
+        }
+        
+        // map
+        int maplength = refresh[pos];
+        pos++;
+        for (i = 0; i < maplength; i++) {
+            mapname += refresh[pos];
+            pos++;
+        }
+        pos += 16 - maplength;
+        
+        // time limit
+        for (i = 0; i < 4; i++) {
+            timelimit += refresh[pos] * (256 ^ i);
+            pos++;
+        }
+        
+        // current time
+        for (i = 0; i < 4; i++) {
+            currenttime += refresh[pos] * (256 ^ i);
+            pos++;
+        }
+        
+        killlimit = refresh[pos] + refresh[pos + 1];
+        pos += 2;
+        
+        gametype = refresh[pos];
+        
+        Window.drawSoldatPlayers(players);
     }
     
 }

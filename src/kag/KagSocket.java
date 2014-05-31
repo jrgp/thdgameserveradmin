@@ -208,7 +208,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> implements ServerInst
                 }
                 else {
                     if (foundPlayers.size() > 0) {
-                        Window.drawPlayers(foundPlayers);
+                        Window.drawKagPlayers(foundPlayers);
                         foundPlayers.clear();
                         findingPlayers = false;
                     }
@@ -216,7 +216,7 @@ public class KagSocket extends SwingWorker<Void, KagNotif> implements ServerInst
                     // Empty list? no players brah
                     else if (findingPlayers) {
                         findingPlayers = false;
-                        Window.drawPlayers(foundPlayers);
+                        Window.drawKagPlayers(foundPlayers);
                         foundPlayers.clear();
                     }
                 }

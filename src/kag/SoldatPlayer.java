@@ -23,10 +23,14 @@ package kag;
  * @author joe
  */
 public class SoldatPlayer {
-    public String name;
-    public Integer id;
-    public String hwid;
-    public String ip;
+    public String name = "";
+    public int id = -1;
+    public String hwid = "";
+    public String ip = "";
+    public int team;
+    public long  kills;
+    public long deaths;
+    public int ping;
     
 
 }

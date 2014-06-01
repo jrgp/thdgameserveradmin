@@ -35,19 +35,17 @@ import javax.swing.JPanel;
  */
 public class TabUtils {
 
-    public static Component getTabLabel(ServerType type, String title, MainWindow tabs, TabBody tab) {
+    public static Component getTabLabel(ServerType type, String title, final MainWindow tabs, final TabBody tab) {
         JLabel label = new JLabel(title);
         label.setHorizontalTextPosition(JLabel.TRAILING);
         label.setIcon(Icons.getIcon(type));
         label.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 5));
-       //= label.setForeground(Color.DARKGREEN);
-        
-        //JButton closeButton = new JButton(MetalIconFactory.getInternalFrameCloseIcon(16));
+
         JButton closeButton = new JButton("X");
 
         
         closeButton.setMargin(new Insets(0, 0, 0, 0));
-        //closeButton.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1));
+
         closeButton.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         closeButton.addMouseListener(new MouseListener() {
             @Override

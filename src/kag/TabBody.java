@@ -2,19 +2,24 @@ package kag;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.swing.Icon;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
+import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
+import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 /*
@@ -175,6 +180,7 @@ public class TabBody extends javax.swing.JPanel {
         if (type == ServerType.SOLDAT) {
             PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(2).setCellRenderer(new coloredrenderer());
+            PlayerTable.getColumnModel().getColumn(5).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
         else if (type == ServerType.KAG) {
@@ -476,19 +482,26 @@ public class TabBody extends javax.swing.JPanel {
         class StyledText {
             SimpleAttributeSet style;
             String text;
+            Style styleS;
             public  StyledText(SimpleAttributeSet style, String text) {
                 this.text = text;
                 this.style = style;
             }
+            public StyledText(Style style) {
+                this.styleS = style;
+                this.text = " ";
+            }
+
         }
         
         StyledDocument doc = ConsoleLog.getStyledDocument();
-        
+        StyleContext context = new StyleContext();
         List<StyledText> words = new ArrayList<>();
         
         Matcher match;
         
         SimpleAttributeSet style;
+        
         
         if (type.equals("connect")) {
             style = new SimpleAttributeSet();
@@ -583,22 +596,46 @@ public class TabBody extends javax.swing.JPanel {
                 words.add(new StyledText(style, match.group(2)));
             }
         }      
-        // something our regexen didn't pickup... gray that fucker out
-        else {
+        else if (type.equals("console") && this.type == ServerType.SOLDAT) {
+            if ((match = SoldatRegexes.linePlayerKill.matcher(line)) != null && match.find()) {
+                Icon gunPic;
+                
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(1)));
+
+                words.add(new StyledText(null, " killed "));
+
+                style = new SimpleAttributeSet();
+                StyleConstants.setBold(style, true);
+                words.add(new StyledText(style, match.group(2)));
+                
+                words.add(new StyledText(null, " with "));
+            
+                if ((gunPic = Icons.soldatGunIcon(match.group(3))) != null) {
+                    Style gunStyle = context.getStyle(StyleContext.DEFAULT_STYLE);
+                    StyleConstants.setComponent(gunStyle, new JLabel(gunPic));
+                    words.add(new StyledText(gunStyle));
+                }
+                else {
+                    style = new SimpleAttributeSet();
+                    StyleConstants.setBold(style, true);
+                    words.add(new StyledText(style, match.group(3)));
+                }
+            }
+        }
+
+        if (words.isEmpty()) {
           style = new SimpleAttributeSet();
           StyleConstants.setForeground(style, Conf.getColor("consolelog.default"));
           words.add(new StyledText(style, line));
         }
-
+        
         words.add(new StyledText(null, "\n"));
         
         try {
             for (StyledText text : words) {
-           //     if (text.style == null) {
-        //            text.style = new SimpleAttributeSet();
-        //            StyleConstants.setForeground(text.style, Conf.getColor("consolelog.default"));
-         //       }
-                doc.insertString(doc.getLength(), text.text, text.style);
+                doc.insertString(doc.getLength(), text.text, text.style == null ? text.styleS : text.style);
             }
         }
         catch (BadLocationException e) {
@@ -661,11 +698,13 @@ public class TabBody extends javax.swing.JPanel {
             
             PlayerModel.addRow(new Object[] {
                 player.id,
-                country != null ? new IconString(country, player.name) : player.name,
+                country != null ? new IconString(country, player.name) 
+                        : new IconString(null, player.name),
                 team, 
                 player.kills,
                 player.deaths,
-                player.ip.equals("0.0.0.0") ? Icons.getBotIcon() : player.ip
+                player.ip.equals("0.0.0.0") ? new IconString(Icons.getBotIcon(), "") 
+                        : new IconString(null, player.ip)
             });
         }
     } 

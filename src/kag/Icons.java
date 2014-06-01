@@ -90,4 +90,18 @@ public class Icons {
         
         return icon;
     }
+    
+    public static Icon soldatGunIcon(String gun) {
+        String path = "res/soldatguns/"+gun.replace(" ", "_")+".png";
+        Icon icon;
+        try {
+             icon = new ImageIcon(path);
+        }
+        catch (Exception e) {
+            System.out.println("Failed getting icon: "+e);
+            return null;
+        }
+        
+        return icon;
+    }
 }

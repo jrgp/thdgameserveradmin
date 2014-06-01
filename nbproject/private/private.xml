@@ -4,15 +4,13 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/KagRegexes.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/ServerTabs.java</file>
+            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/SoldatServer.java</file>
+            <file>file:/Users/joe/NetBeansProjects/kagadmin/build.xml</file>
             <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/KagPlayer.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/SoldatPlayer.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/SoldatSocket.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/KagSocket.java</file>
+            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/IpCountry.java</file>
+            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/MainWindow.java</file>
             <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/TabBody.java</file>
             <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/Icons.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/TabUtils.java</file>
-            <file>file:/Users/joe/NetBeansProjects/kagadmin/src/kag/SoldatRegexes.java</file>
         </group>
     </open-files>
 </project-private>

@@ -57,6 +57,8 @@ class SoldatNotif {
  */
 public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements ServerInstance {
     
+    private static final int refreshSize = 1188;
+    
     private Socket Sock = null;
     private BufferedReader In = null;
     private DataOutputStream Out = null;
@@ -85,7 +87,8 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         "Alpha",
         "Bravo",
         "Charlie",
-        "Delta"
+        "Delta",
+        "Spectator"
     };
     
     public final static Color teamIdToColor[] = {
@@ -93,7 +96,8 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         Color.RED,
         Color.BLUE,
         Color.YELLOW,
-        Color.GREEN
+        Color.GREEN,
+        Color.GRAY
     };
     
     public SoldatServer () {
@@ -175,7 +179,8 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         
         Matcher match;
         
-        char[] refresh = new char[1188];
+        char[] refresh = new char[refreshSize];
+        char[] refreshx = new char[1992]; 
         
         int i;
         
@@ -210,12 +215,34 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                 if (line.equals("REFRESH")) {
                     System.out.println("I am expecting refresh packet...");
                     try {
-                       System.out.println("Got bytes for refresh: "+In.read(refresh, 0, 1188));
+                       System.out.println("Got bytes for refresh: "+In.read(refresh, 0, refreshSize));
                        parseRefresh(refresh);
                     }
-                    catch (Exception e) {
-                        System.out.println("failed shit: "+e);
+                    catch (IOException e) {
+                        System.out.println("failed refresh: "+e);
                     }
+                    continue; 
+                }
+                else if (line.equals("REFRESHX")) {
+                    System.out.println("I am expecting refreshx packet...");
+                    
+                    try {
+                        int recv, j = 0;
+                        while (j <= 1992) {
+                            recv = In.read(refreshx, j, 1992 - j);
+                            if (recv < 1)
+                                break;
+                            j += recv;
+                            System.out.println("Got bytes"+recv);
+                        }
+                        System.out.println("Got bytes for refreshx: "+j);
+                        parseRefreshX(refreshx);                        
+                    }
+                    catch (Exception e) {
+                        System.out.println("issue with refreshx:");
+                        e.printStackTrace();
+                    }
+
                     continue; 
                 }
                 else {
@@ -238,10 +265,14 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
             }
         }
         catch (IOException e) {
-            
+            System.out.println("Io socket exception: "+e);
         }
         catch (InterruptedException e) {
             System.out.println("Disconnecting via interrupt");
+        }
+        catch (Exception e) {
+            System.out.println("caught something else: " + e);
+            e.printStackTrace();
         }
         finally  {
             Disconnect();
@@ -369,4 +400,41 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         Window.updateSoldatGameInfo(mapname, gameModeIdToString[gametype], timelimit - currenttime, ServerVersion);
     }
     
+    private void parseRefreshX(char[] refreshx) {
+        
+        
+        SoldatPlayer[] players = new SoldatPlayer[32];
+        String map, nextMap;
+        boolean passworded;
+        int[] teamscore = new int[4];
+        float redflagx, redflagy, blueflagx, blueflagy;
+        long currentTime, timeLimit;
+        int killlimit, maxPlayers, maxSpectators;
+        int pos = 0;
+        int i, j;
+        
+        for (i = 0; i < 32; i++) {
+            players[i] = new SoldatPlayer();
+            int length = refreshx[pos];
+            pos++;
+            for (j = 0; j < length; j++) {
+                players[i].name += refreshx[pos];
+                pos++;
+            }
+            pos += 24 - length;
+        }
+
+        for (i = 0; i < 32; i++) {
+            for (j = 0; j < 12; j++) {
+                players[i].hwid += refreshx[pos];
+                pos++;
+            }
+        }
+        
+        for (SoldatPlayer player : players) {
+            if (player.name.equals(""))
+                continue;
+            System.out.println("Player: "+player.name+" hwid: "+player.hwid);
+        }
+    }
 }

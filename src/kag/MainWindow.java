@@ -56,6 +56,7 @@ public class MainWindow extends javax.swing.JFrame {
         addSoldatButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("THD Admin");
         setMinimumSize(new java.awt.Dimension(600, 400));
 
         addKagButton.setText("Add KAG Tab");

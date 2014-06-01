@@ -2,7 +2,6 @@ package kag;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Insets;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultCaret;
-import javax.swing.text.DefaultStyledDocument;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
@@ -614,7 +612,9 @@ public class TabBody extends javax.swing.JPanel {
             
                 if ((gunPic = Icons.soldatGunIcon(match.group(3))) != null) {
                     Style gunStyle = context.getStyle(StyleContext.DEFAULT_STYLE);
-                    StyleConstants.setComponent(gunStyle, new JLabel(gunPic));
+                    JLabel gunLabel = new JLabel(gunPic);
+                    gunLabel.setToolTipText(match.group(3));
+                    StyleConstants.setComponent(gunStyle, gunLabel);
                     words.add(new StyledText(gunStyle));
                 }
                 else {

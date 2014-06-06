@@ -404,12 +404,12 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         
         
         SoldatPlayer[] players = new SoldatPlayer[32];
-        String map, nextMap;
+        String map = "", nextMap = "";
         boolean passworded;
         int[] teamscore = new int[4];
         float redflagx, redflagy, blueflagx, blueflagy;
         long currentTime, timeLimit;
-        int killlimit, maxPlayers, maxSpectators;
+        int killlimit, maxPlayers, maxSpectators, gameType;
         int pos = 0;
         int i, j;
         
@@ -430,11 +430,129 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                 pos++;
             }
         }
+    
+        for (i = 0; i < 32; i++) {
+            players[i].team = refreshx[pos];
+            pos++;
+        }
+
+        for (i = 0; i < 32; i++) {
+            players[i].kills = refreshx[pos] + (refreshx[pos + 1] * 256);
+            pos += 2;
+        }        
+    
+        for (i = 0; i < 32; i++) {
+            players[i].caps = refreshx[pos];
+            pos++;
+        }
+ 
+        for (i = 0; i < 32; i++) {
+            players[i].deaths = refreshx[pos] + (refreshx[pos + 1] * 256);
+            pos += 2;
+        }      
         
+        // ping
+        for (i = 0; i < 32; i++) {
+            //players[i].deaths = refreshx[pos] + (refreshx[pos + 1] * 256);
+            pos += 4;
+        }              
+    
+        for (i = 0; i < 32; i++) {
+            players[i].id = refreshx[pos];
+            pos++;
+        }
+
+	for (i = 0; i < 32; i++) {
+            int[] ips = new int[4];
+            for (j = 0; j < 4; j++) {
+                ips[j] = refreshx[pos];
+                pos++;
+            }
+            players[i].ip = ips[0]+"."+ips[1]+"."+ips[2]+"."+ips[3];
+	}          
+
+        // player x
+        for (i = 0; i < 32; i++) {
+            pos += 4;
+        }           
+
+        // player y
+        for (i = 0; i < 32; i++) {
+            pos += 4;
+        }          
+        
+        // red flag x
+        pos += 4;
+
+        // red flag y
+        pos += 4;
+
+        // blue flag x
+        pos += 4;
+
+        // blue flag y
+        pos += 4;
+        
+        
+        // team scores
+        for (i = 0; i < 4; i++) {
+            teamscore[i] = refreshx[pos] + (refreshx[pos + 1] * 256);
+            pos += 2;
+        }
+        
+        // map
+        j = refreshx[pos];
+        System.out.println("map length: "+j);
+        pos++;
+        for (i = 0; i < j; i++) {
+            map += refreshx[pos];
+            pos++;
+        }
+        pos += 16 - j;        
+        
+        // time limit
+        pos += 4;
+        
+        // current time
+        pos += 4;
+        
+        // kill limit
+        pos += 2;
+        
+        gameType = refreshx[pos];
+        pos++;
+        
+        maxPlayers = refreshx[pos];
+        pos++;
+        
+        maxSpectators = refreshx[pos];
+        pos++;
+        
+        passworded = refreshx[pos] == 1;
+        pos++;
+        
+        System.out.println("Gametype: "+gameType);
+        System.out.println("max players: "+maxPlayers);
+        System.out.println("passworded: "+(passworded ? "Yes" : "no"));
+
+        
+        // next map
+        j = refreshx[pos];
+        System.out.println("next map length: "+j);
+        pos++;
+        for (i = 0; i < j; i++) {
+            nextMap += refreshx[pos];
+            pos++;
+        }
+        pos += 16 - j;  
+        
+        // debug
         for (SoldatPlayer player : players) {
             if (player.name.equals(""))
                 continue;
-            System.out.println("Player: "+player.name+" hwid: "+player.hwid);
+            System.out.println("Player: "+player.name+" hwid: "+player.hwid+" team: "+player.team);
         }
+        
+        System.out.println("Current map: '"+map+"' next map: '"+nextMap+"'");
     }
 }

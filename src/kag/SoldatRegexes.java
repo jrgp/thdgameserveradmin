@@ -32,6 +32,6 @@ public class SoldatRegexes {
     public static void init() {
         lineServerVersion = Pattern.compile("^Server Version: ([\\d\\.]+)");
         linePlayerKill = Pattern.compile("\\(\\d+\\) (.+) killed \\(\\d+\\) (.+) with "+
-         "(Ak-74|Barrett M82A1|Bow|Chainsaw|Clusters|Combat Knife|Desert Eagles|FN Minimi|Flamer|Grenade|HK MP5|Hands|LAW|M79|Ruger 77|Spas-12|Steyr AUG|USSOCOM|XM214 Minigun)$");
+         "(Ak-74|Barrett M82A1|Bow|Chainsaw|Clusters|Combat Knife|Desert Eagles|FN Minimi|Flamer|Grenade|HK MP5|Hands|LAW|M79|Ruger 77|Spas-12|Steyr AUG|USSOCOM|XM214 Minigun|Stationary gun)$");
     }
 }

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package kag;
+package thadmin;
 
 import java.net.*;
 import java.io.*;
@@ -67,7 +67,6 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
     public Boolean Connected = false;
     
     public KagServer () {
-        KagRegexes.init();
     }
     
     

@@ -16,22 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package kag;
-
-import java.util.regex.Pattern;
+package thadmin;
 
 /**
  *
  * @author joe
  */
-public class SoldatRegexes {
-    
-    public static Pattern lineServerVersion;
-    public static Pattern linePlayerKill;
-    
-    public static void init() {
-        lineServerVersion = Pattern.compile("^Server Version: ([\\d\\.]+)");
-        linePlayerKill = Pattern.compile("\\(\\d+\\) (.+) killed \\(\\d+\\) (.+) with "+
-         "(Ak-74|Barrett M82A1|Bow|Chainsaw|Clusters|Combat Knife|Desert Eagles|FN Minimi|Flamer|Grenade|HK MP5|Hands|LAW|M79|Ruger 77|Spas-12|Steyr AUG|USSOCOM|XM214 Minigun|Stationary gun)$");
-    }
+public enum ServerType {
+    KAG,
+    SOLDAT,
+    STORM;
 }

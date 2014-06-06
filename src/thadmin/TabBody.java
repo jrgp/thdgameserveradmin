@@ -1,4 +1,4 @@
-package kag;
+package thadmin;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -19,6 +19,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import pmsrenderer.SolTV;
 
 /*
  * Copyright (C) 2014 joe
@@ -78,6 +79,10 @@ public class TabBody extends javax.swing.JPanel {
     
     private MainWindow tabController;
     
+    private SolTV soltv;
+    
+    private String currentMap = "";
+    
     /**
      * Creates new form TabBody
      * @param type
@@ -92,13 +97,10 @@ public class TabBody extends javax.swing.JPanel {
         // This gets visible for Soldat. Not for kag as i dont have enough 
         // info to show
         BottomInfoPanel.setVisible(false);
-         
-        if (type == ServerType.KAG) {
-            KagRegexes.init();
+        if (type != ServerType.SOLDAT) {
+            ShowTvButton.setVisible(false);
         }
-        else if (type == ServerType.SOLDAT) {
-            SoldatRegexes.init();
-        }
+
 
         DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -156,7 +158,7 @@ public class TabBody extends javax.swing.JPanel {
 
                 },
                 new String [] {
-                    "ID", "Player", "Team", "Kills", "Deaths", "IP"
+                    "ID", "Player", "Team", "Kills", "Deaths", "HWID", "IP", "Ping"
                 }
             ) {
                 @Override
@@ -178,7 +180,7 @@ public class TabBody extends javax.swing.JPanel {
         if (type == ServerType.SOLDAT) {
             PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(2).setCellRenderer(new coloredrenderer());
-            PlayerTable.getColumnModel().getColumn(5).setCellRenderer(new coloredrenderer());
+            PlayerTable.getColumnModel().getColumn(7).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
         else if (type == ServerType.KAG) {
@@ -217,6 +219,7 @@ public class TabBody extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         MapNameLabel = new javax.swing.JLabel();
         VersionLabel = new javax.swing.JLabel();
+        ShowTvButton = new javax.swing.JButton();
 
         jLabel1.setText("IP:port");
 
@@ -311,6 +314,19 @@ public class TabBody extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        ShowTvButton.setText("Show TV");
+        ShowTvButton.setEnabled(false);
+        ShowTvButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ShowTvButtonMouseClicked(evt);
+            }
+        });
+        ShowTvButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ShowTvButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -330,7 +346,8 @@ public class TabBody extends javax.swing.JPanel {
                         .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addGap(0, 252, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
+                        .addComponent(ShowTvButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -346,7 +363,8 @@ public class TabBody extends javax.swing.JPanel {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2)
                     .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(ConnectButton))
+                    .addComponent(ConnectButton)
+                    .addComponent(ShowTvButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -391,13 +409,48 @@ public class TabBody extends javax.swing.JPanel {
     }
     
     private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
-               SendCommand();
+       SendCommand();
     }//GEN-LAST:event_CommandButtonActionPerformed
 
+    private void ShowTvButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowTvButtonActionPerformed
+       if (!Connected) {
+           System.out.println("Not connected. Killing.");
+           killSolTv();
+           return;
+       }
+       
+       if (soltv != null) {
+           System.out.println("Not null. Killing.");
+           killSolTv();
+           return;
+       }
+       
+       System.out.println("Creating SolTV Object");
+       soltv = new SolTV();
+       
+       if (!currentMap.equals("")) {
+           System.out.println("Beginning rneder");
+           soltv.render(currentMap);
+           ShowTvButton.setText("Close TV");
+       }
+    }//GEN-LAST:event_ShowTvButtonActionPerformed
+
+    private void ShowTvButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ShowTvButtonMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ShowTvButtonMouseClicked
+
+    private void killSolTv() {
+       if (soltv != null) {
+           soltv.kill();
+           soltv = null;
+       }
+       ShowTvButton.setText("Show TV");
+    }
+    
     private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {                                     
         if (evt.getKeyCode() == KeyEvent.VK_ENTER)
             HandleConnect();
-    }                                    
+    }                                
 
     private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {                                    
         if (evt.getKeyCode() == KeyEvent.VK_ENTER)
@@ -471,6 +524,8 @@ public class TabBody extends javax.swing.JPanel {
             System.out.println("Cancelled worker");
         else
             System.out.println("Failed to cancel worker");
+        
+        killSolTv();
     }
     
     public void addConsoleLine(String line, String type) {
@@ -652,9 +707,13 @@ public class TabBody extends javax.swing.JPanel {
         Connected = true;
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
+        ShowTvButton.setEnabled(true);
         tabController.fixTabs();
-        if (type == ServerType.SOLDAT)
+        if (type == ServerType.SOLDAT) {
             BottomInfoPanel.setVisible(true);
+            ShowTvButton.setVisible(true);
+            ShowTvButton.setText("Show TV");
+        }
     }
 
     public void onDisconnect() {
@@ -670,6 +729,8 @@ public class TabBody extends javax.swing.JPanel {
         PlayerModel.setRowCount(0);
         tabController.fixTabs();
         BottomInfoPanel.setVisible(false);
+        ShowTvButton.setEnabled(false);
+        ShowTvButton.setText("Show TV");
     }
     
     public void drawKagPlayers(List<KagPlayer> players) {
@@ -703,16 +764,29 @@ public class TabBody extends javax.swing.JPanel {
                 team, 
                 player.kills,
                 player.deaths,
+                player.hwid,
+                player.ip.equals("0.0.0.0") ? "" : player.ip,
                 player.ip.equals("0.0.0.0") ? new IconString(Icons.getBotIcon(), "") 
-                        : new IconString(null, player.ip)
+                        : new IconString(null, ""+player.ping)
             });
         }
-    } 
+        
+        if (soltv != null) {
+            soltv.setPlayers(players);
+        }
+    }
     
-    public void updateSoldatGameInfo(String map, String gametype, long timeleft, String version) {
+    public void updateSoldatGameInfo(String map, String nextMap, String gametype, long timeleft, String version) {
         GameTypeLabel.setText(gametype);
-        MapNameLabel.setText(map);
+        MapNameLabel.setText(map+" ("+nextMap+")");
         VersionLabel.setText(version);
+        
+        if (!currentMap.equals(map) && soltv != null) {
+            soltv.kill();
+            soltv.render(map);
+        }
+        
+        currentMap = map;
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -727,6 +801,7 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JLabel MapNameLabel;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
+    private javax.swing.JButton ShowTvButton;
     private javax.swing.JLabel VersionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

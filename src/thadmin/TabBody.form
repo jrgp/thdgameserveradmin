@@ -31,7 +31,8 @@
                       <Component id="PasswordBox" min="-2" pref="122" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="ConnectButton" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace min="0" pref="252" max="32767" attributes="0"/>
+                      <EmptySpace pref="155" max="32767" attributes="0"/>
+                      <Component id="ShowTvButton" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Group type="102" alignment="0" attributes="0">
                       <Component id="CommandBox" max="32767" attributes="0"/>
@@ -53,6 +54,7 @@
                   <Component id="jLabel2" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="PasswordBox" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="ConnectButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="ShowTvButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="jSplitPane1" pref="391" max="32767" attributes="0"/>
@@ -233,5 +235,15 @@
         </Component>
       </SubComponents>
     </Container>
+    <Component class="javax.swing.JButton" name="ShowTvButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Show TV"/>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="ShowTvButtonMouseClicked"/>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="ShowTvButtonActionPerformed"/>
+      </Events>
+    </Component>
   </SubComponents>
 </Form>

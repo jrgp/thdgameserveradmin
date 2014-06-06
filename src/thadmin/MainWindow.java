@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package kag;
+package thadmin;
 
 import java.util.ArrayList;
 import javax.swing.UIManager;
@@ -57,7 +57,7 @@ public class MainWindow extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("THD Admin");
-        setMinimumSize(new java.awt.Dimension(600, 400));
+        setMinimumSize(new java.awt.Dimension(700, 400));
 
         addKagButton.setText("Add KAG Tab");
         addKagButton.addActionListener(new java.awt.event.ActionListener() {
@@ -130,7 +130,6 @@ public class MainWindow extends javax.swing.JFrame {
         int tabIndexToKill = -1;
         for (int index = 0; index < tabcount; index++) {
             if (component == (TabBody) Tabs.getComponentAt(index)) {
-           //     System.out.println("Will kill tab for: "+component.getHostString()+"at index"+index);
                 tabIndexToKill = index;
                 break;
             }

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package kag;
+package thadmin;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -24,6 +24,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
@@ -101,7 +103,6 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
     };
     
     public SoldatServer () {
-        KagRegexes.init();
     }
 
     @Override
@@ -196,9 +197,9 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
                 // With java there is no way of detecting when a socket closes on the remote end except
                 // to see if writing fails.
-                if (i % 100 == 0) {
-                    System.out.println("Sending REFRESH to see if writing fails which means we're disconnected");
-                    Out.writeBytes("REFRESH\n");
+                if (i % 25 == 0) {
+                    System.out.println("Sending REFRESHX to see if writing fails which means we're disconnected");
+                    Out.writeBytes("REFRESHX\n");
                     Out.flush();
                 }
 
@@ -397,21 +398,28 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         gametype = refresh[pos];
         
         Window.drawSoldatPlayers(players);
-        Window.updateSoldatGameInfo(mapname, gameModeIdToString[gametype], timelimit - currenttime, ServerVersion);
+        Window.updateSoldatGameInfo(mapname, "", gameModeIdToString[gametype], timelimit - currenttime, ServerVersion);
     }
     
     private void parseRefreshX(char[] refreshx) {
         
+        int i, j;
+        
+        ByteBuffer buff = ByteBuffer.allocate(refreshx.length + 1);
+        buff.order(ByteOrder.LITTLE_ENDIAN);
+        
+        for (i = 0; i < refreshx.length; i++)
+            buff.put((byte) refreshx[i]);
         
         SoldatPlayer[] players = new SoldatPlayer[32];
         String map = "", nextMap = "";
         boolean passworded;
         int[] teamscore = new int[4];
-        float redflagx, redflagy, blueflagx, blueflagy;
+        double redflagx, redflagy, blueflagx, blueflagy;
         long currentTime, timeLimit;
-        int killlimit, maxPlayers, maxSpectators, gameType;
+        int killLimit, maxPlayers, maxSpectators, gameType;
         int pos = 0;
-        int i, j;
+        
         
         for (i = 0; i < 32; i++) {
             players[i] = new SoldatPlayer();
@@ -437,7 +445,7 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         }
 
         for (i = 0; i < 32; i++) {
-            players[i].kills = refreshx[pos] + (refreshx[pos + 1] * 256);
+            players[i].kills = buff.getShort(pos);
             pos += 2;
         }        
     
@@ -447,13 +455,13 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         }
  
         for (i = 0; i < 32; i++) {
-            players[i].deaths = refreshx[pos] + (refreshx[pos + 1] * 256);
+            players[i].deaths = buff.getShort(pos);
             pos += 2;
         }      
         
         // ping
         for (i = 0; i < 32; i++) {
-            //players[i].deaths = refreshx[pos] + (refreshx[pos + 1] * 256);
+            players[i].ping = buff.getInt(pos);
             pos += 4;
         }              
     
@@ -473,26 +481,31 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
         // player x
         for (i = 0; i < 32; i++) {
+            players[i].x = buff.getFloat(pos);
             pos += 4;
         }           
 
         // player y
         for (i = 0; i < 32; i++) {
+            players[i].y = buff.getFloat(pos);
             pos += 4;
         }          
         
         // red flag x
+        redflagx = buff.getFloat(pos);
         pos += 4;
 
         // red flag y
+        redflagy = buff.getFloat(pos);
         pos += 4;
 
         // blue flag x
+        blueflagx = buff.getFloat(pos);
         pos += 4;
 
         // blue flag y
+        blueflagy = buff.getFloat(pos);
         pos += 4;
-        
         
         // team scores
         for (i = 0; i < 4; i++) {
@@ -511,12 +524,17 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         pos += 16 - j;        
         
         // time limit
+        timeLimit = buff.getInt(pos);
         pos += 4;
         
         // current time
+        currentTime = buff.getInt(pos);
         pos += 4;
         
+        System.out.println("Time: "+currentTime+"/"+timeLimit);
+        
         // kill limit
+        killLimit = buff.getShort(pos);
         pos += 2;
         
         gameType = refreshx[pos];
@@ -535,24 +553,26 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         System.out.println("max players: "+maxPlayers);
         System.out.println("passworded: "+(passworded ? "Yes" : "no"));
 
-        
         // next map
         j = refreshx[pos];
-        System.out.println("next map length: "+j);
         pos++;
         for (i = 0; i < j; i++) {
             nextMap += refreshx[pos];
             pos++;
         }
-        pos += 16 - j;  
         
         // debug
         for (SoldatPlayer player : players) {
             if (player.name.equals(""))
                 continue;
-            System.out.println("Player: "+player.name+" hwid: "+player.hwid+" team: "+player.team);
+            System.out.println("Player: "+player.name+" hwid: "+player.hwid+" team: "+player.team+" kills: "+player.kills+" deaths: "+player.deaths+" ping: "+
+                    player.ping+" x:"+player.x+" y: "+player.y);
         }
         
         System.out.println("Current map: '"+map+"' next map: '"+nextMap+"'");
+        
+       
+        Window.drawSoldatPlayers(players);
+        Window.updateSoldatGameInfo(map, nextMap, gameModeIdToString[gameType], timeLimit - currentTime, ServerVersion);        
     }
 }

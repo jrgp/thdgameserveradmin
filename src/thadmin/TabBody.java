@@ -187,6 +187,10 @@ public class TabBody extends javax.swing.JPanel {
             PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
+        
+        // SolTV code sucks
+        ShowTvButton.setEnabled(false);
+        ShowTvButton.setVisible(false);
     }
 
     public ServerType getType() {
@@ -707,11 +711,18 @@ public class TabBody extends javax.swing.JPanel {
         Connected = true;
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
-        ShowTvButton.setEnabled(true);
+        
+        //ShowTvButton.setEnabled(true);
+        
+        // SolTV code defines shit
+        ShowTvButton.setEnabled(false);
+        ShowTvButton.setVisible(false);
+        
         tabController.fixTabs();
         if (type == ServerType.SOLDAT) {
             BottomInfoPanel.setVisible(true);
-            ShowTvButton.setVisible(true);
+            
+            //ShowTvButton.setVisible(true);
             ShowTvButton.setText("Show TV");
         }
     }

@@ -3,6 +3,8 @@ package thadmin;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -10,6 +12,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.SwingUtilities;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
@@ -41,7 +44,7 @@ import pmsrenderer.SolTV;
 
 class ColorString {
     public ColorString () {
-        
+
     }
     public ColorString (Color color, String string) {
         this.color = color;
@@ -53,7 +56,7 @@ class ColorString {
 
 class IconString {
     public IconString () {
-        
+
     }
     public IconString (Icon icon, String string) {
         this.icon = icon;
@@ -61,6 +64,11 @@ class IconString {
     }
     Icon icon;
     String string;
+
+    // Used for bastardising this class to hold player data used by context menu
+    // forged by right click
+    String Player, Type;
+    int Id;
 }
 
 /**
@@ -70,19 +78,19 @@ class IconString {
 public class TabBody extends javax.swing.JPanel {
     private ServerInstance Server = null;
     private boolean Connected = false;
-    
+
     private DefaultTableModel PlayerModel = null;
-    
+
     private ServerType type;
-    
+
     private String hostString = "";
-    
+
     private MainWindow tabController;
-    
+
     private SolTV soltv;
-    
+
     private String currentMap = "";
-    
+
     /**
      * Creates new form TabBody
      * @param type
@@ -91,10 +99,10 @@ public class TabBody extends javax.swing.JPanel {
     public TabBody(ServerType type, MainWindow tabController) {
         this.type = type;
         this.tabController = tabController;
-        
+
         initComponents();
-        
-        // This gets visible for Soldat. Not for kag as i dont have enough 
+
+        // This gets visible for Soldat. Not for kag as i dont have enough
         // info to show
         BottomInfoPanel.setVisible(false);
         if (type != ServerType.SOLDAT) {
@@ -104,14 +112,14 @@ public class TabBody extends javax.swing.JPanel {
 
         DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-       
-        // Add color and icon capabilities to the cell renderer. Spent a while googling how to set the 
+
+        // Add color and icon capabilities to the cell renderer. Spent a while googling how to set the
         // foreground color of a cell but nothing came up. Fell back to reading the swing source
         // and finding a suitable hack.
         class coloredrenderer extends DefaultTableCellRenderer {
             @Override
             public Component getTableCellRendererComponent(JTable table, Object value,
-                                                            boolean isSelected, boolean hasFocus, 
+                                                            boolean isSelected, boolean hasFocus,
                                                             int row, int column) {
 
                Component elem = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
@@ -127,11 +135,11 @@ public class TabBody extends javax.swing.JPanel {
                    this.setIcon(info.icon);
                    this.setText(info.string);
                }
-               
+
                return elem;
              }
-        };        
-        
+        };
+
         if (type == ServerType.KAG) {
             PlayerModel = new javax.swing.table.DefaultTableModel(
                 new Object [][] {
@@ -170,12 +178,12 @@ public class TabBody extends javax.swing.JPanel {
                 public boolean isCellEditable(int rowIndex, int columnIndex) {
                     return false;
                 }
-            };   
+            };
         }
-        
+
         PlayerTable.setModel(PlayerModel);
         PlayerTable.setBackground(Color.white);
- 
+
         // This must be called after the model set
         if (type == ServerType.SOLDAT) {
             PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
@@ -187,7 +195,7 @@ public class TabBody extends javax.swing.JPanel {
             PlayerTable.getColumnModel().getColumn(1).setCellRenderer(new coloredrenderer());
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
-        
+
         // SolTV code sucks
         ShowTvButton.setEnabled(false);
         ShowTvButton.setVisible(false);
@@ -196,7 +204,7 @@ public class TabBody extends javax.swing.JPanel {
     public ServerType getType() {
         return type;
     }
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -261,6 +269,11 @@ public class TabBody extends javax.swing.JPanel {
 
         ConsoleLog.setEditable(false);
         ConsoleLog.setMinimumSize(new java.awt.Dimension(0, 100));
+        ConsoleLog.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ConsoleLogMouseClicked(evt);
+            }
+        });
         ConsoleLogPane.setViewportView(ConsoleLog);
 
         jSplitPane1.setBottomComponent(ConsoleLogPane);
@@ -278,6 +291,11 @@ public class TabBody extends javax.swing.JPanel {
         PlayerTable.setShowGrid(false);
         PlayerTable.setSurrendersFocusOnKeystroke(true);
         PlayerTable.getTableHeader().setReorderingAllowed(false);
+        PlayerTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                PlayerTableMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(PlayerTable);
 
         jSplitPane1.setLeftComponent(jScrollPane1);
@@ -395,23 +413,23 @@ public class TabBody extends javax.swing.JPanel {
         else if (ConnectButton.getText().equals("Connect")) {
             System.out.println("clicked connect");
             HandleConnect();
-        } 
+        }
     }//GEN-LAST:event_ConnectButtonActionPerformed
     private void SendCommand() {
         String command = CommandBox.getText().trim();
         CommandBox.setText("");
-        
+
         if (command.length() == 0 || !Connected || Server == null) {
             return;
         }
-        
+
         Server.sendCommand(command);
     }
-    
+
     public boolean isConnected() {
         return Connected;
     }
-    
+
     private void CommandButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_CommandButtonActionPerformed
        SendCommand();
     }//GEN-LAST:event_CommandButtonActionPerformed
@@ -422,16 +440,16 @@ public class TabBody extends javax.swing.JPanel {
            killSolTv();
            return;
        }
-       
+
        if (soltv != null) {
            System.out.println("Not null. Killing.");
            killSolTv();
            return;
        }
-       
+
        System.out.println("Creating SolTV Object");
        soltv = new SolTV();
-       
+
        if (!currentMap.equals("")) {
            System.out.println("Beginning rneder");
            soltv.render(currentMap);
@@ -443,6 +461,20 @@ public class TabBody extends javax.swing.JPanel {
         // TODO add your handling code here:
     }//GEN-LAST:event_ShowTvButtonMouseClicked
 
+    private void ConsoleLogMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ConsoleLogMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ConsoleLogMouseClicked
+
+    private void PlayerTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_PlayerTableMouseClicked
+        if (!Connected) return;
+        if (!SwingUtilities.isRightMouseButton(evt)) return;
+
+        int row = PlayerTable.rowAtPoint(evt.getPoint());
+        IconString icon = (IconString) PlayerTable.getModel().getValueAt(row, 1);
+        PlayerContextMenu menu = new PlayerContextMenu(Server, icon.Player, icon.Id);
+        menu.show(evt.getComponent(), evt.getX(), evt.getY());
+    }//GEN-LAST:event_PlayerTableMouseClicked
+
     private void killSolTv() {
        if (soltv != null) {
            soltv.kill();
@@ -450,34 +482,34 @@ public class TabBody extends javax.swing.JPanel {
        }
        ShowTvButton.setText("Show TV");
     }
-    
-    private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {                                     
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
-            HandleConnect();
-    }                                
 
-    private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {                                    
+    private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_ENTER)
             HandleConnect();
-    }   
-    
+    }
+
+    private void CommandBoxKeyTyped(java.awt.event.KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER)
+            HandleConnect();
+    }
+
     private void HandleConnect() {
         String IpPort = HostBox.getText().trim();
         String Password = new String(PasswordBox.getPassword());
-        
+
         String Host;
         Integer Port;
-        
+
         String parts[] = IpPort.split(":");
-        
+
         if (parts.length < 2 || IpPort.length() == 0 || Password.length() == 0) {
             JOptionPane.showMessageDialog(this, "You must appropriately fill out the password fields",
                     "Incomplete input", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         Host = parts[0];
-        
+
         try {
             Port = Integer.parseInt(parts[1]);
         } catch(NumberFormatException e) {
@@ -485,57 +517,57 @@ public class TabBody extends javax.swing.JPanel {
                     "Incomplete input", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         if (Port < 1 || Port > 65000) {
             JOptionPane.showMessageDialog(this, "Port is not within a realistic range",
                     "Incomplete input", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
+
         System.out.println("passed checks");
-        
+
         ConnectButton.setEnabled(false);
-        
+
         hostString = IpPort;
-        
+
         if (this.type == ServerType.KAG)
             Server = new KagServer();
         else if (this.type == ServerType.SOLDAT)
             Server = new SoldatServer();
-        else 
+        else
             return;
-        
+
         Server.setWindow(this);
-        
+
         Server.setDetails(Host, Password, Port);
         Server.execute();
-        
+
         tabController.fixTabs();
-    }        
-    
+    }
+
     public String getHostString() {
         return hostString;
     }
-    
+
     public void HandleDisonnect() {
-        
+
         if (Server == null)
             return;
-        
+
         boolean success = Server.cancel(true);
-        
+
         if (success)
             System.out.println("Cancelled worker");
         else
             System.out.println("Failed to cancel worker");
-        
+
         killSolTv();
     }
-    
+
     public void addConsoleLine(String line, String type) {
-        
+
         tabController.fixTabs();
-        
+
         class StyledText {
             SimpleAttributeSet style;
             String text;
@@ -550,113 +582,113 @@ public class TabBody extends javax.swing.JPanel {
             }
 
         }
-        
+
         StyledDocument doc = ConsoleLog.getStyledDocument();
         StyleContext context = new StyleContext();
         List<StyledText> words = new ArrayList<>();
-        
+
         Matcher match;
-        
+
         SimpleAttributeSet style;
-        
-        
+
+
         if (type.equals("connect")) {
             style = new SimpleAttributeSet();
-            StyleConstants.setForeground(style, Conf.getColor("consolelog.connected")); 
+            StyleConstants.setForeground(style, Conf.getColor("consolelog.connected"));
             StyleConstants.setBold(style, true);
             words.add(new StyledText(style, line));
         }
         else if (type.equals("disconnect")) {
             style = new SimpleAttributeSet();
-            StyleConstants.setForeground(style, Conf.getColor("consolelog.disconnected")); 
+            StyleConstants.setForeground(style, Conf.getColor("consolelog.disconnected"));
             StyleConstants.setBold(style, true);
             words.add(new StyledText(style, line));
         }
         else if (type.equals("console") && this.type == ServerType.KAG) {
-            
+
             if ((match = KagRegexes.lineRconConnect.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp"));
                 words.add(new StyledText(style, match.group(1)));
-                
+
                 words.add(new StyledText(null, " TCP RCON Connection from "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("kag.rconauthip")); 
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconauthip"));
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
-                
+
                 words.add(new StyledText(null, " is now authenticated"));
             }
             else if ((match = KagRegexes.linePlayerSpeak.matcher(line)) != null && match.find()) {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp"));
                 words.add(new StyledText(style, match.group(1)));
-                
+
                 words.add(new StyledText(null, " "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeaknick")); 
+                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeaknick"));
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
-                
+
                 words.add(new StyledText(null, " "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeakmessage")); 
-                words.add(new StyledText(style, match.group(3)));                
+                StyleConstants.setForeground(style, Conf.getColor("kag.playerspeakmessage"));
+                words.add(new StyledText(style, match.group(3)));
             }
             else if ((match = KagRegexes.lineRconCommand.matcher(line)) != null && match.find()) {
-                
+
                 // I do not care when people run /players
                 if (match.group(3).equals("/players")) {
                     return;
                 }
-                
+
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp"));
                 words.add(new StyledText(style, match.group(1)));
-                
+
                 words.add(new StyledText(null, " RCON command from "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmdsrc")); 
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmdsrc"));
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
-                
+
                 words.add(new StyledText(null, ": "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmd")); 
+                StyleConstants.setForeground(style, Conf.getColor("kag.rconcmd"));
                 StyleConstants.setBold(style, true);
-                words.add(new StyledText(style, match.group(3)));                
+                words.add(new StyledText(style, match.group(3)));
             }
             else if ((match = KagRegexes.lineConsole.matcher(line)) != null && match.find()) {
-                
+
                 // don't care about empty shiz or other stuff we know happens
                 if (match.group(2).trim().length() == 0 || match.group(2).equals(" /players")) {
                     return;
                 }
-                
+
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
-                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp")); 
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.timestamp"));
                 words.add(new StyledText(style, match.group(1)));
-                
+
                 words.add(new StyledText(null, " "));
-                
+
                 style = new SimpleAttributeSet();
-                StyleConstants.setForeground(style, Conf.getColor("consolelog.default")); 
+                StyleConstants.setForeground(style, Conf.getColor("consolelog.default"));
                 words.add(new StyledText(style, match.group(2)));
             }
-        }      
+        }
         else if (type.equals("console") && this.type == ServerType.SOLDAT) {
             if ((match = SoldatRegexes.linePlayerKill.matcher(line)) != null && match.find()) {
                 Icon gunPic;
-                
+
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(1)));
@@ -666,9 +698,9 @@ public class TabBody extends javax.swing.JPanel {
                 style = new SimpleAttributeSet();
                 StyleConstants.setBold(style, true);
                 words.add(new StyledText(style, match.group(2)));
-                
+
                 words.add(new StyledText(null, " with "));
-            
+
                 if ((gunPic = Icons.soldatGunIcon(match.group(3))) != null) {
                     Style gunStyle = context.getStyle(StyleContext.DEFAULT_STYLE);
                     JLabel gunLabel = new JLabel(gunPic);
@@ -689,19 +721,19 @@ public class TabBody extends javax.swing.JPanel {
           StyleConstants.setForeground(style, Conf.getColor("consolelog.default"));
           words.add(new StyledText(style, line));
         }
-        
+
         words.add(new StyledText(null, "\n"));
-        
+
         try {
             for (StyledText text : words) {
                 doc.insertString(doc.getLength(), text.text, text.style == null ? text.styleS : text.style);
             }
         }
         catch (BadLocationException e) {
-            
+
         }
     }
-    
+
     public void onConnect() {
         ConnectButton.setText("Disconnect");
         HostBox.setEditable(false);
@@ -711,17 +743,17 @@ public class TabBody extends javax.swing.JPanel {
         Connected = true;
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
-        
+
         //ShowTvButton.setEnabled(true);
-        
-        // SolTV code defines shit
+
+        // SolTV code is pretty bad right now
         ShowTvButton.setEnabled(false);
         ShowTvButton.setVisible(false);
-        
+
         tabController.fixTabs();
         if (type == ServerType.SOLDAT) {
             BottomInfoPanel.setVisible(true);
-            
+
             //ShowTvButton.setVisible(true);
             ShowTvButton.setText("Show TV");
         }
@@ -743,63 +775,70 @@ public class TabBody extends javax.swing.JPanel {
         ShowTvButton.setEnabled(false);
         ShowTvButton.setText("Show TV");
     }
-    
+
     public void drawKagPlayers(List<KagPlayer> players) {
         PlayerModel.setRowCount(0);
         for (KagPlayer player : players) {
             Icon country = Icons.ipCountryIcon(player.ip);
+            IconString playerIcon = new IconString(country == null ? null : country, player.name);
+            playerIcon.Player = player.name;
+            playerIcon.Id = player.id;
+            playerIcon.Type = "PlayerMenu";
             PlayerModel.addRow(new Object[]{
                 player.id,
-                country != null ? new IconString(country, player.name) : player.name,
+                playerIcon,
                 player.ip,
                 player.hwid
             });
         }
     }
- 
+
     public void drawSoldatPlayers(SoldatPlayer[] players) {
         PlayerModel.setRowCount(0);
         for (SoldatPlayer player : players) {
             if (player.name.length() == 0)
                 continue;
-           
+
             ColorString team = new ColorString();
             team.color = SoldatServer.teamIdToColor[player.team];
             team.string = SoldatServer.teamIdToString[player.team];
             Icon country = Icons.ipCountryIcon(player.ip);
-            
+
+            IconString playerIcon = new IconString(country == null ? null : country, player.name);
+            playerIcon.Player = player.name;
+            playerIcon.Type = "PlayerMenu";
+            playerIcon.Id = player.id;
             PlayerModel.addRow(new Object[] {
                 player.id,
-                country != null ? new IconString(country, player.name) 
-                        : new IconString(null, player.name),
-                team, 
+                playerIcon,
+                team,
                 player.kills,
                 player.deaths,
                 player.hwid,
                 player.ip.equals("0.0.0.0") ? "" : player.ip,
-                player.ip.equals("0.0.0.0") ? new IconString(Icons.getBotIcon(), "") 
+                player.ip.equals("0.0.0.0") ? new IconString(Icons.getBotIcon(), "")
                         : new IconString(null, ""+player.ping)
             });
         }
-        
+
         if (soltv != null) {
             soltv.setPlayers(players);
         }
     }
-    
+
     public void updateSoldatGameInfo(String map, String nextMap, String gametype, long timeleft, String version) {
         GameTypeLabel.setText(gametype);
-        MapNameLabel.setText(map+" ("+nextMap+")");
+        MapNameLabel.setText(map+" (next: "+nextMap+")");
         VersionLabel.setText(version);
-        
+
         if (!currentMap.equals(map) && soltv != null) {
             soltv.kill();
             soltv.render(map);
         }
-        
+
         currentMap = map;
     }
-    
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel BottomInfoPanel;
     private javax.swing.JTextField CommandBox;

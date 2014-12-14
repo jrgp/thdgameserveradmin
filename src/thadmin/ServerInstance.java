@@ -28,6 +28,8 @@ public interface ServerInstance {
     public void setWindow(TabBody Window);
     public void Disconnect();
     public void sendCommand(String line);
+    public void kickPlayer(int id);
+    public void banPlayer(int id);
     
     // from swingworker
     public void execute();

@@ -24,6 +24,8 @@ import java.util.regex.*;
 import javax.swing.SwingWorker;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 class KagNotif {
@@ -31,10 +33,10 @@ class KagNotif {
     public String Type = "";
     public String Line = "";
     public String Event = "";
-    
+
     public KagNotif() {
     }
-    
+
     public static KagNotif lineFactory(String Line) {
         KagNotif notif = new KagNotif();
         notif.Line = Line;
@@ -54,40 +56,41 @@ class KagNotif {
  * @author joe
  */
 public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInstance {
-    
+
     private Socket Sock = null;
     private BufferedReader In = null;
     private DataOutputStream Out = null;
-    
+
     private TabBody Window;
-    
+
     private String Host, Password;
     private Integer Port;
-    
+
     public Boolean Connected = false;
-    
+
     public KagServer () {
     }
-    
-    
+
+
     @Override
     public void setWindow(TabBody Window) {
         this.Window = Window;
     };
-    
+
     @Override
     public void setDetails(String Host, String Password, Integer Port) {
         this.Host = Host;
         this.Password = Password;
         this.Port = Port;
     }
-    
+
+    @Override
     public void Connect () {
-        
+
         System.out.println(String.format("Connecting to %s:%d with %s", Host, Port, Password));
-        
+
         Connected = false;
-        
+
         try {
             Sock = new Socket(Host, Port);
             In = new BufferedReader(new InputStreamReader(Sock.getInputStream(), "ISO-8859-1"));
@@ -98,7 +101,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
             Connected = false;
         }
     }
-    
+
     @Override
     public void Disconnect() {
         System.out.println("Disconnecting");
@@ -108,7 +111,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
             Out.close();
         }
         catch (IOException e) {
-        } 
+        }
         Connected = false;
         publish(KagNotif.eventFactory("Disconnected"));
     }
@@ -126,31 +129,55 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
             System.out.println("Failed writing");
         }
     }
-    
+
+    @Override
+    public void kickPlayer(int id) {
+        if (!Connected)
+            return;
+        System.out.println("Will kick player ID "+id);
+        try {
+            Out.writeBytes("/kickid "+id+"\n");
+        } catch (IOException ex) {
+            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    @Override
+    public void banPlayer(int id) {
+        if (!Connected)
+            return;
+        System.out.println("Will ban player ID "+id);
+        try {
+            Out.writeBytes("/banid "+id+"\n");
+        } catch (IOException ex) {
+            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     @Override
     protected Void doInBackground() throws Exception {
         System.out.println("in background");
-        
+
         if (Connected) {
             System.out.println("Already connected?");
             return null;
         }
-        
+
         Connect();
-        
+
         String line;
-        
+
         // [06:16:53]        [jrgp] (id 140) (ip 67.188.114.9) (hwid 1169726824)
-        
+
         Matcher playermatcher;
         List<KagPlayer> foundPlayers = new ArrayList<>();
-        
+
         int i;
         boolean findingPlayers = false;
-        
+
         try {
             for (i = 0; ;i++) {
-                
+
                 // Only way we can watch for this thread being killed (user clicking disconnect)
                 // is if we çheck the result of this method call often
                 if (Thread.interrupted()) {
@@ -173,7 +200,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                     Thread.sleep(100);
                     continue;
                 }
-                
+
                 if ((line = In.readLine()) == null)
                     break;
 
@@ -181,24 +208,24 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                     Connected = true;
                     publish(KagNotif.eventFactory("Connected"));
                 }
-                    
+
                 System.out.println("Received line via while: '"+line+"'");
                 line = line.trim();
-                
+
                 if ((playermatcher = KagRegexes.linePlayer.matcher(line)) != null
                         && playermatcher.find()) {
-                    
+
                     int playerID = 0;
-                    
+
                     try {
                         playerID = Integer.parseInt(playermatcher.group(2));
                     }
                     catch (NumberFormatException e) {
                     }
 
-                    foundPlayers.add(new KagPlayer(playermatcher.group(1), 
+                    foundPlayers.add(new KagPlayer(playermatcher.group(1),
                         playerID, playermatcher.group(3), playermatcher.group(4)));
-                    
+
                     continue;
                 }
                 else if (KagRegexes.linePlayersListStart.matcher(line).matches()) {
@@ -211,7 +238,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                         foundPlayers.clear();
                         findingPlayers = false;
                     }
-                    
+
                     // Empty list? no players brah
                     else if (findingPlayers) {
                         findingPlayers = false;
@@ -219,12 +246,12 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                         foundPlayers.clear();
                     }
                 }
-                
+
                 publish(KagNotif.lineFactory(line));
             }
         }
         catch (IOException e) {
-            
+
         }
         catch (InterruptedException e) {
             System.out.println("Disconnecting via interrupt");
@@ -234,10 +261,10 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
         }
         return null;
     }
-    
+
     @Override
     protected void process(List<KagNotif> messages) {
-        
+
         for (KagNotif notif : messages) {
             if (notif.Type.equals("line")) {
                 System.out.println("Recieved line via process: "+notif.Line);

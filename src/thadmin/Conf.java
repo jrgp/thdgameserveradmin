@@ -25,7 +25,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.regex.Pattern;
 
 /**
  *
@@ -33,20 +32,20 @@ import java.util.regex.Pattern;
  */
 public class Conf {
     private static HashMap<String, Color> colors = null;
-    
-    public static void load() {
-        
+
+    public static void Load() {
+
         colors = new HashMap<>();
-        
+
         URL colorsPath = ClassLoader.getSystemResource("colors.conf");
         InputStream colorStream = null;
         BufferedReader colorReader = null;
         String line;
-        
+
         try {
             colorStream = colorsPath.openStream();
             colorReader = new BufferedReader(new InputStreamReader(colorStream));
-            
+
             while ((line = colorReader.readLine()) != null) {
                 String parts[] = line.split(" ");
                 if (parts[0].equals(";") || parts.length != 2)
@@ -57,14 +56,14 @@ public class Conf {
                 catch (NumberFormatException e) {
                 }
             }
-          
+
             colorStream.close();
             colorReader.close();
         }
         catch (IOException e) {
         }
     }
-    
+
     public static Color getColor(String key) {
         Color color = colors.get(key);
         if (color == null) {

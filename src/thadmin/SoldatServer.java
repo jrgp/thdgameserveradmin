@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
+import static thadmin.ServerType.SOLDAT;
 
 class SoldatNotif {
 
@@ -600,5 +601,15 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         } catch (IOException ex) {
             Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    @Override
+    public FavoriteServer getFavServer() {
+        FavoriteServer fav = new FavoriteServer();
+        fav.Ip = Host;
+        fav.Port = Port;
+        fav.Password = Password;
+        fav.Type = SOLDAT;
+        return fav;
     }
 }

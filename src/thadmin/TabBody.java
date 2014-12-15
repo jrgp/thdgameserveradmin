@@ -199,6 +199,15 @@ public class TabBody extends javax.swing.JPanel {
         // SolTV code sucks
         ShowTvButton.setEnabled(false);
         ShowTvButton.setVisible(false);
+
+        FavoriteToggleButton.setVisible(true);
+        FavoriteToggleButton.setEnabled(false);
+    }
+
+    public void SetServerAndJoin(String Ip, int Port, String Password) {
+        HostBox.setText(Ip+":"+Port);
+        PasswordBox.setText(Password);
+        ConnectButton.doClick();
     }
 
     public ServerType getType() {
@@ -232,6 +241,7 @@ public class TabBody extends javax.swing.JPanel {
         MapNameLabel = new javax.swing.JLabel();
         VersionLabel = new javax.swing.JLabel();
         ShowTvButton = new javax.swing.JButton();
+        FavoriteToggleButton = new javax.swing.JButton();
 
         jLabel1.setText("IP:port");
 
@@ -349,6 +359,14 @@ public class TabBody extends javax.swing.JPanel {
             }
         });
 
+        FavoriteToggleButton.setText("Add Favorite");
+        FavoriteToggleButton.setEnabled(false);
+        FavoriteToggleButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                FavoriteToggleButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -368,7 +386,9 @@ public class TabBody extends javax.swing.JPanel {
                         .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, 122, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ConnectButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 155, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(FavoriteToggleButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(ShowTvButton))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
@@ -386,7 +406,8 @@ public class TabBody extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton)
-                    .addComponent(ShowTvButton))
+                    .addComponent(ShowTvButton)
+                    .addComponent(FavoriteToggleButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -474,6 +495,31 @@ public class TabBody extends javax.swing.JPanel {
         PlayerContextMenu menu = new PlayerContextMenu(Server, icon.Player, icon.Id);
         menu.show(evt.getComponent(), evt.getX(), evt.getY());
     }//GEN-LAST:event_PlayerTableMouseClicked
+
+    private void FavoriteToggleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_FavoriteToggleButtonActionPerformed
+        if (!Connected || Server == null)
+            return;
+
+        FavoriteServer fav = Server.getFavServer();
+        if (FavoriteServers.CheckInFavorites(fav)) {
+            FavoriteServers.DelFromFavorites(fav);
+        }
+        else {
+            FavoriteServers.AddToFavorites(fav);
+        }
+        FavoriteServers.Save();
+
+        ManageFavoriteToggleText(fav);
+    }//GEN-LAST:event_FavoriteToggleButtonActionPerformed
+
+    private void ManageFavoriteToggleText(FavoriteServer fav) {
+        if (FavoriteServers.CheckInFavorites(null == fav ? Server.getFavServer() : fav)) {
+            FavoriteToggleButton.setText("Un-Favorite");
+        }
+        else {
+            FavoriteToggleButton.setText("Add Favorite");
+        }
+    }
 
     private void killSolTv() {
        if (soltv != null) {
@@ -757,6 +803,12 @@ public class TabBody extends javax.swing.JPanel {
             //ShowTvButton.setVisible(true);
             ShowTvButton.setText("Show TV");
         }
+
+        if (Server != null) {
+            FavoriteToggleButton.setVisible(true);
+            FavoriteToggleButton.setEnabled(true);
+            ManageFavoriteToggleText(null);
+        }
     }
 
     public void onDisconnect() {
@@ -774,6 +826,7 @@ public class TabBody extends javax.swing.JPanel {
         BottomInfoPanel.setVisible(false);
         ShowTvButton.setEnabled(false);
         ShowTvButton.setText("Show TV");
+        FavoriteToggleButton.setEnabled(true);
     }
 
     public void drawKagPlayers(List<KagPlayer> players) {
@@ -846,6 +899,7 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JButton ConnectButton;
     private javax.swing.JTextPane ConsoleLog;
     private javax.swing.JScrollPane ConsoleLogPane;
+    private javax.swing.JButton FavoriteToggleButton;
     private javax.swing.JLabel GameTypeLabel;
     private javax.swing.JTextField HostBox;
     private javax.swing.JLabel MapNameLabel;

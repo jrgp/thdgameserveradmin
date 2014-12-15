@@ -32,7 +32,9 @@
               <Component id="addKagButton" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Component id="addSoldatButton" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="342" max="32767" attributes="0"/>
+              <EmptySpace pref="235" max="32767" attributes="0"/>
+              <Component id="openFavoritesButton" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
           <Component id="Tabs" alignment="1" max="32767" attributes="0"/>
       </Group>
@@ -44,6 +46,7 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="addKagButton" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="addSoldatButton" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="openFavoritesButton" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="Tabs" pref="353" max="32767" attributes="0"/>
@@ -71,6 +74,14 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addSoldatButtonActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="openFavoritesButton">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Favorites"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="openFavoritesButtonActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

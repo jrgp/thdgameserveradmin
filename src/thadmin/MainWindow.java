@@ -19,7 +19,6 @@
 package thadmin;
 
 import java.util.ArrayList;
-import javax.swing.UIManager;
 
 /**
  *
@@ -28,18 +27,22 @@ import javax.swing.UIManager;
 public class MainWindow extends javax.swing.JFrame {
 
     ArrayList<TabBody> serverTabs;
-    
+
     /**
      * Creates new form ServerTabs
      */
     public MainWindow() {
         initComponents();
-        
+
+        openFavoritesButton.setVisible(false);
+
         addKagButton.setIcon(Icons.getIcon(ServerType.KAG));
         addSoldatButton.setIcon(Icons.getIcon(ServerType.SOLDAT));
-        
+
         IpCountry.Load();
-        Conf.load();
+        Conf.Load();
+        FavoriteServers.Load();
+        FavoriteServers.connectServers(this);
     }
 
     /**
@@ -54,6 +57,7 @@ public class MainWindow extends javax.swing.JFrame {
         Tabs = new javax.swing.JTabbedPane();
         addKagButton = new javax.swing.JButton();
         addSoldatButton = new javax.swing.JButton();
+        openFavoritesButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("THD Admin");
@@ -73,6 +77,13 @@ public class MainWindow extends javax.swing.JFrame {
             }
         });
 
+        openFavoritesButton.setText("Favorites");
+        openFavoritesButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                openFavoritesButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -82,7 +93,9 @@ public class MainWindow extends javax.swing.JFrame {
                 .addComponent(addKagButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(addSoldatButton)
-                .addContainerGap(342, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 235, Short.MAX_VALUE)
+                .addComponent(openFavoritesButton)
+                .addContainerGap())
             .addComponent(Tabs, javax.swing.GroupLayout.Alignment.TRAILING)
         );
         layout.setVerticalGroup(
@@ -91,7 +104,8 @@ public class MainWindow extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(addKagButton)
-                    .addComponent(addSoldatButton))
+                    .addComponent(addSoldatButton)
+                    .addComponent(openFavoritesButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(Tabs, javax.swing.GroupLayout.DEFAULT_SIZE, 353, Short.MAX_VALUE)
                 .addContainerGap())
@@ -113,6 +127,15 @@ public class MainWindow extends javax.swing.JFrame {
         Tabs.addTab("Server", tab);
         fixTabs();    }//GEN-LAST:event_addSoldatButtonActionPerformed
 
+    private void openFavoritesButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_openFavoritesButtonActionPerformed
+
+    }//GEN-LAST:event_openFavoritesButtonActionPerformed
+
+    public void addTab(TabBody tab, String title) {
+        Tabs.addTab(title, tab);
+        fixTabs();
+    }
+
     public void fixTabs() {
         int tabcount = Tabs.getTabCount();
         for (int index = 0; index < tabcount; index++) {
@@ -120,11 +143,11 @@ public class MainWindow extends javax.swing.JFrame {
             String title = tab.getHostString();
             title = title.length() == 0 ? "Server" : title;
             title = title+(title.equals("Server") ? "" : (tab.isConnected() ? " (Connected)" : " (Disconnected)"));
-            
+
             Tabs.setTabComponentAt(index, TabUtils.getTabLabel(tab.getType(), title, this, tab));
         }
     }
-    
+
     public void killTab(TabBody component) {
         int tabcount = Tabs.getTabCount();
         int tabIndexToKill = -1;
@@ -141,16 +164,16 @@ public class MainWindow extends javax.swing.JFrame {
         component.HandleDisonnect();
         Tabs.removeTabAt(tabIndexToKill);
     }
-    
+
     /**
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -182,5 +205,6 @@ public class MainWindow extends javax.swing.JFrame {
     private javax.swing.JTabbedPane Tabs;
     private javax.swing.JButton addKagButton;
     private javax.swing.JButton addSoldatButton;
+    private javax.swing.JButton openFavoritesButton;
     // End of variables declaration//GEN-END:variables
 }

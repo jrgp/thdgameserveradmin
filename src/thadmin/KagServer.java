@@ -18,14 +18,15 @@
 
 package thadmin;
 
-import java.net.*;
 import java.io.*;
-import java.util.regex.*;
-import javax.swing.SwingWorker;
-import java.util.List;
+import java.net.*;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.*;
+import javax.swing.SwingWorker;
+import static thadmin.ServerType.KAG;
 
 
 class KagNotif {
@@ -209,7 +210,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                     publish(KagNotif.eventFactory("Connected"));
                 }
 
-                System.out.println("Received line via while: '"+line+"'");
+                //System.out.println("Received line via while: '"+line+"'");
                 line = line.trim();
 
                 if ((playermatcher = KagRegexes.linePlayer.matcher(line)) != null
@@ -267,7 +268,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
 
         for (KagNotif notif : messages) {
             if (notif.Type.equals("line")) {
-                System.out.println("Recieved line via process: "+notif.Line);
+                //System.out.println("Recieved line via process: "+notif.Line);
                 Window.addConsoleLine(notif.Line, "console");
             }
             else if (notif.Type.equals("event") && notif.Event.equals("Disconnected")) {
@@ -277,5 +278,16 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                 Window.onConnect();
             }
        }
+    }
+
+    @Override
+    public FavoriteServer getFavServer() {
+        FavoriteServer fav = new FavoriteServer();
+        fav.Ip = Host;
+        fav.Port = Port;
+        fav.Password = Password;
+        fav.Type = KAG;
+        System.out.println(fav);
+        return fav;
     }
 }

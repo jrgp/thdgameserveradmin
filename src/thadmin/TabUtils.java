@@ -19,7 +19,6 @@
 package thadmin;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
@@ -43,7 +42,7 @@ public class TabUtils {
 
         JButton closeButton = new JButton("X");
 
-        
+
         closeButton.setMargin(new Insets(0, 0, 0, 0));
 
         closeButton.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
@@ -65,12 +64,12 @@ public class TabUtils {
             @Override
             public void mouseExited(MouseEvent e) {}
 	});
-        
+
         JPanel tabComponent = new JPanel(new BorderLayout());
         tabComponent.setOpaque(false);
         tabComponent.add(label, BorderLayout.WEST);
         tabComponent.add(closeButton, BorderLayout.EAST);
-        
+
         return (Component) tabComponent;
     }
 }

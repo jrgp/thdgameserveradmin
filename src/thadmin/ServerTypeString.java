@@ -18,21 +18,35 @@
 
 package thadmin;
 
+import static thadmin.ServerType.KAG;
+import static thadmin.ServerType.SOLDAT;
+import static thadmin.ServerType.STORM;
+
 /**
  *
  * @author joe
  */
-public interface ServerInstance {
-    public void Connect();
-    public void setDetails(String Host, String Password, Integer Port);
-    public void setWindow(TabBody Window);
-    public void Disconnect();
-    public void sendCommand(String line);
-    public void kickPlayer(int id);
-    public void banPlayer(int id);
-    public FavoriteServer getFavServer();
-
-    // from swingworker
-    public void execute();
-    public boolean cancel(boolean doit);
+public class ServerTypeString {
+    public static String TypeToString(ServerType type) {
+        switch (type) {
+            case SOLDAT:
+                return "Soldat";
+            case KAG:
+                return "KAG";
+            case STORM:
+                return "Storm";
+        }
+        return null;
+    }
+    public static ServerType StringToType(String type) {
+        switch (type.toLowerCase()) {
+            case "soldat":
+                return SOLDAT;
+            case "kag":
+                return KAG;
+            case "storm":
+                return STORM;
+        }
+        return null;
+    }
 }

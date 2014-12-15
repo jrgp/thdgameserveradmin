@@ -3,3 +3,4 @@ dist/
 .DS_Store
 nbproject/private
 v*/*
+res/favorites.conf

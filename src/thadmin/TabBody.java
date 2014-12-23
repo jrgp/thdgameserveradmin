@@ -753,6 +753,9 @@ public class TabBody extends javax.swing.JPanel {
                     gunLabel.setToolTipText(match.group(3));
                     StyleConstants.setComponent(gunStyle, gunLabel);
                     words.add(new StyledText(gunStyle));
+
+                    // Without this fucking dot after a picture, box does not automatically scroll down.
+                    words.add(new StyledText(null, "."));
                 }
                 else {
                     style = new SimpleAttributeSet();

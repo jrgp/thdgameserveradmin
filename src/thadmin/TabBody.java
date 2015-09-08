@@ -3,8 +3,6 @@ package thadmin;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -22,7 +20,6 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
-import pmsrenderer.SolTV;
 
 /*
  * Copyright (C) 2014 joe
@@ -87,8 +84,6 @@ public class TabBody extends javax.swing.JPanel {
 
     private MainWindow tabController;
 
-    private SolTV soltv;
-
     private String currentMap = "";
 
     /**
@@ -105,10 +100,6 @@ public class TabBody extends javax.swing.JPanel {
         // This gets visible for Soldat. Not for kag as i dont have enough
         // info to show
         BottomInfoPanel.setVisible(false);
-        if (type != ServerType.SOLDAT) {
-            ShowTvButton.setVisible(false);
-        }
-
 
         DefaultCaret caret = (DefaultCaret)ConsoleLog.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
@@ -196,9 +187,6 @@ public class TabBody extends javax.swing.JPanel {
             PlayerTable.getColumnModel().getColumn(0).setMaxWidth(50);
         }
 
-        // SolTV code sucks
-        ShowTvButton.setEnabled(false);
-        ShowTvButton.setVisible(false);
 
         FavoriteToggleButton.setVisible(true);
         FavoriteToggleButton.setEnabled(false);
@@ -240,7 +228,6 @@ public class TabBody extends javax.swing.JPanel {
         jSeparator1 = new javax.swing.JSeparator();
         MapNameLabel = new javax.swing.JLabel();
         VersionLabel = new javax.swing.JLabel();
-        ShowTvButton = new javax.swing.JButton();
         FavoriteToggleButton = new javax.swing.JButton();
 
         jLabel1.setText("IP:port");
@@ -298,7 +285,6 @@ public class TabBody extends javax.swing.JPanel {
 
             }
         ));
-        PlayerTable.setShowGrid(false);
         PlayerTable.setSurrendersFocusOnKeystroke(true);
         PlayerTable.getTableHeader().setReorderingAllowed(false);
         PlayerTable.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -346,19 +332,6 @@ public class TabBody extends javax.swing.JPanel {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        ShowTvButton.setText("Show TV");
-        ShowTvButton.setEnabled(false);
-        ShowTvButton.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ShowTvButtonMouseClicked(evt);
-            }
-        });
-        ShowTvButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                ShowTvButtonActionPerformed(evt);
-            }
-        });
-
         FavoriteToggleButton.setText("Add Favorite");
         FavoriteToggleButton.setEnabled(false);
         FavoriteToggleButton.addActionListener(new java.awt.event.ActionListener() {
@@ -388,8 +361,7 @@ public class TabBody extends javax.swing.JPanel {
                         .addComponent(ConnectButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(FavoriteToggleButton)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(ShowTvButton))
+                        .addGap(100, 100, 100))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(CommandBox)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -406,7 +378,6 @@ public class TabBody extends javax.swing.JPanel {
                     .addComponent(jLabel2)
                     .addComponent(PasswordBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(ConnectButton)
-                    .addComponent(ShowTvButton)
                     .addComponent(FavoriteToggleButton))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jSplitPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 391, Short.MAX_VALUE)
@@ -455,33 +426,6 @@ public class TabBody extends javax.swing.JPanel {
        SendCommand();
     }//GEN-LAST:event_CommandButtonActionPerformed
 
-    private void ShowTvButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ShowTvButtonActionPerformed
-       if (!Connected) {
-           System.out.println("Not connected. Killing.");
-           killSolTv();
-           return;
-       }
-
-       if (soltv != null) {
-           System.out.println("Not null. Killing.");
-           killSolTv();
-           return;
-       }
-
-       System.out.println("Creating SolTV Object");
-       soltv = new SolTV();
-
-       if (!currentMap.equals("")) {
-           System.out.println("Beginning rneder");
-           soltv.render(currentMap);
-           ShowTvButton.setText("Close TV");
-       }
-    }//GEN-LAST:event_ShowTvButtonActionPerformed
-
-    private void ShowTvButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ShowTvButtonMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ShowTvButtonMouseClicked
-
     private void ConsoleLogMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ConsoleLogMouseClicked
         // TODO add your handling code here:
     }//GEN-LAST:event_ConsoleLogMouseClicked
@@ -519,14 +463,6 @@ public class TabBody extends javax.swing.JPanel {
         else {
             FavoriteToggleButton.setText("Add Favorite");
         }
-    }
-
-    private void killSolTv() {
-       if (soltv != null) {
-           soltv.kill();
-           soltv = null;
-       }
-       ShowTvButton.setText("Show TV");
     }
 
     private void PasswordBoxKeyTyped(java.awt.event.KeyEvent evt) {
@@ -606,8 +542,6 @@ public class TabBody extends javax.swing.JPanel {
             System.out.println("Cancelled worker");
         else
             System.out.println("Failed to cancel worker");
-
-        killSolTv();
     }
 
     public void addConsoleLine(String line, String type) {
@@ -793,18 +727,9 @@ public class TabBody extends javax.swing.JPanel {
         ConnectButton.setEnabled(true);
         addConsoleLine("Connected", "connect");
 
-        //ShowTvButton.setEnabled(true);
-
-        // SolTV code is pretty bad right now
-        ShowTvButton.setEnabled(false);
-        ShowTvButton.setVisible(false);
-
         tabController.fixTabs();
         if (type == ServerType.SOLDAT) {
             BottomInfoPanel.setVisible(true);
-
-            //ShowTvButton.setVisible(true);
-            ShowTvButton.setText("Show TV");
         }
 
         if (Server != null) {
@@ -827,8 +752,6 @@ public class TabBody extends javax.swing.JPanel {
         PlayerModel.setRowCount(0);
         tabController.fixTabs();
         BottomInfoPanel.setVisible(false);
-        ShowTvButton.setEnabled(false);
-        ShowTvButton.setText("Show TV");
         FavoriteToggleButton.setEnabled(true);
     }
 
@@ -877,9 +800,6 @@ public class TabBody extends javax.swing.JPanel {
             });
         }
 
-        if (soltv != null) {
-            soltv.setPlayers(players);
-        }
     }
 
     public void updateSoldatGameInfo(String map, String nextMap, String gametype, long timeleft, String version) {
@@ -887,10 +807,6 @@ public class TabBody extends javax.swing.JPanel {
         MapNameLabel.setText(map+" (next: "+nextMap+")");
         VersionLabel.setText(version);
 
-        if (!currentMap.equals(map) && soltv != null) {
-            soltv.kill();
-            soltv.render(map);
-        }
 
         currentMap = map;
     }
@@ -908,7 +824,6 @@ public class TabBody extends javax.swing.JPanel {
     private javax.swing.JLabel MapNameLabel;
     private javax.swing.JPasswordField PasswordBox;
     private javax.swing.JTable PlayerTable;
-    private javax.swing.JButton ShowTvButton;
     private javax.swing.JLabel VersionLabel;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

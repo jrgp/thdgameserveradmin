@@ -16,14 +16,22 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
 
 /**
  *
  * @author joe
  */
-public enum ServerType {
-    KAG,
-    SOLDAT,
-    STORM;
+public class SoldatPlayer {
+    public String name = "";
+    public int id = -1;
+    public String hwid = "";
+    public String ip = "";
+    public int team;
+    public long  kills;
+    public long deaths;
+    public int ping;
+    public double x;
+    public double y;
+    public int caps;
 }

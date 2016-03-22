@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.0</version>
+        <configuration>
+          <source>1.7</source>
+          <target>1.7</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.6</version>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>com.jrgp.thadmin.MainWindow</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.jrgp</groupId>
+  <artifactId>thdadmin</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>
+
+  <name>THD GameServer Admin</name>
+  <url>http://github.com/jrgp/thdgameserveradmin</url>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.wealoha</groupId>
+      <artifactId>ip-geolocation</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+  </dependencies>
+</project>

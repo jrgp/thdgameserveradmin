@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
 
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import static thadmin.IpCountry.lookup;
+import static com.jrgp.thadmin.IpCountry.lookup;
 
 /**
  *

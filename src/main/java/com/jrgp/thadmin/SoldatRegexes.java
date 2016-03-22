@@ -16,22 +16,20 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
+
+import java.util.regex.Pattern;
 
 /**
  *
  * @author joe
  */
-public class SoldatPlayer {
-    public String name = "";
-    public int id = -1;
-    public String hwid = "";
-    public String ip = "";
-    public int team;
-    public long  kills;
-    public long deaths;
-    public int ping;
-    public double x;
-    public double y;
-    public int caps;
+public class SoldatRegexes {
+    
+    public final static Pattern lineServerVersion = Pattern.compile("^Server Version: ([\\d\\.]+)");
+    public final static Pattern linePlayerKill = Pattern.compile("\\(\\d+\\) (.+) killed \\(\\d+\\) (.+) with "+
+         "(Ak-74|Barrett M82A1|Bow|Chainsaw|Clusters|Combat Knife|Desert Eagles|FN Minimi|Flamer|Grenade|HK MP5|Hands|LAW|M79|Ruger 77|Spas-12|Steyr AUG|USSOCOM"+
+            "|Cluster Grenades|XM214 Minigun|Stationary gun)$");;
+    public final static Pattern lineNextMap = Pattern.compile("^Next map: (.+)");
+
 }

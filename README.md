@@ -11,23 +11,27 @@ Screenshots:
 - http://jrgp.us/screenshots/kagadmin12.png
 - http://jrgp.us/screenshots/kagadmin13.png
 
-Build dependency's/jars:
+# Compile:
 
-- ip2c.jar: http://firestats.cc/wiki/ip2c
+    mvn package
 
-Features:
+# Run:
+
+    java -jar target/thdadmin-1.0.jar
+
+# Features:
 
 - Multiple servers for either game in multiple tabs
 - List of players currently in server, as well as ip2country picture and HW ID where applicable
 - Console log with color codes as well as inline pictures
 - Tested on Windows, Mac, and Linux
 
-Notes:
+# Notes:
 
 - It's developed in Neatbeans as it allegedly has better support for designing Swing forums
 - Licensed under GPL
 
-Contact:
+# Contact:
 
 - Contact me via github or at joe@u13.net via email (I promise I'll reply)
 - PR's welcome

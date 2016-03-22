@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Joe Gillotti
+ * Copyright (C) 2014 joe
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,22 +16,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
 
 /**
  *
  * @author joe
  */
-public class KagPlayer {
-    public String name;
-    public Integer id;
-    public String hwid;
-    public String ip;
-    
-    public KagPlayer(String name, Integer id, String ip, String hwid) {
-        this.name = name;
-        this.id = id;
-        this.hwid = hwid;
-        this.ip = ip;
-    }
+public interface ServerInstance {
+    public void Connect();
+    public void setDetails(String Host, String Password, Integer Port);
+    public void setWindow(TabBody Window);
+    public void Disconnect();
+    public void sendCommand(String line);
+    public void kickPlayer(int id);
+    public void banPlayer(int id);
+    public FavoriteServer getFavServer();
+
+    // from swingworker
+    public void execute();
+    public boolean cancel(boolean doit);
 }

@@ -1,4 +1,4 @@
-package thadmin;
+package com.jrgp.thadmin;
 
 import java.awt.Color;
 import java.awt.Component;

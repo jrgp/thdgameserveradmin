@@ -4,3 +4,5 @@ dist/
 nbproject/private
 v*/*
 res/favorites.conf
+target
+nbactions.xml

@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
 
 import java.io.*;
 import java.net.*;
@@ -26,7 +26,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.*;
 import javax.swing.SwingWorker;
-import static thadmin.ServerType.KAG;
+import static com.jrgp.thadmin.ServerType.KAG;
 
 
 class KagNotif {

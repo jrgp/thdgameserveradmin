@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
 
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -31,7 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
-import static thadmin.ServerType.SOLDAT;
+import static com.jrgp.thadmin.ServerType.SOLDAT;
 
 class SoldatNotif {
 

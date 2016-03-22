@@ -16,37 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
-
-import static thadmin.ServerType.KAG;
-import static thadmin.ServerType.SOLDAT;
-import static thadmin.ServerType.STORM;
+package com.jrgp.thadmin;
 
 /**
  *
  * @author joe
  */
-public class ServerTypeString {
-    public static String TypeToString(ServerType type) {
-        switch (type) {
-            case SOLDAT:
-                return "Soldat";
-            case KAG:
-                return "KAG";
-            case STORM:
-                return "Storm";
-        }
-        return null;
-    }
-    public static ServerType StringToType(String type) {
-        switch (type.toLowerCase()) {
-            case "soldat":
-                return SOLDAT;
-            case "kag":
-                return KAG;
-            case "storm":
-                return STORM;
-        }
-        return null;
-    }
+public enum ServerType {
+    KAG,
+    SOLDAT,
+    STORM;
 }

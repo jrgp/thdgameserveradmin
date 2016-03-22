@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 joe
+ * Copyright (C) 2014, 2016 joe
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,23 +16,23 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package thadmin;
+package com.jrgp.thadmin;
+
+import com.wealoha.ipgeolocation.IpCountryHelper;
 
 /**
  *
  * @author joe
  */
-public interface ServerInstance {
-    public void Connect();
-    public void setDetails(String Host, String Password, Integer Port);
-    public void setWindow(TabBody Window);
-    public void Disconnect();
-    public void sendCommand(String line);
-    public void kickPlayer(int id);
-    public void banPlayer(int id);
-    public FavoriteServer getFavServer();
+public class IpCountry {
+    
+    public static void Load() {
+    }
+    
+    public static String lookup(String ip) {
+        String country = IpCountryHelper.getCountry(ip);
+        System.out.println("Found country "+country+" for ip "+ip);
+        return country;
+    }
 
-    // from swingworker
-    public void execute();
-    public boolean cancel(boolean doit);
 }

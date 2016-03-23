@@ -30,9 +30,14 @@ public class IpCountry {
     }
     
     public static String lookup(String ip) {
+        
+        // XXX: pick a different ip2country library!
+        return null;
+        
         String country = IpCountryHelper.getCountry(ip);
         System.out.println("Found country "+country+" for ip "+ip);
+        if (country.equals(""))
+            return null;
         return country;
     }
-
 }

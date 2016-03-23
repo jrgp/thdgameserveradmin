@@ -34,4 +34,7 @@ public class SoldatPlayer {
     public double x;
     public double y;
     public int caps;
+    public boolean isBot() {
+        return ip.equals("0.0.0.0");
+    }
 }

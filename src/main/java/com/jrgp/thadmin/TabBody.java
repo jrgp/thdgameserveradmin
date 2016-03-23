@@ -781,9 +781,13 @@ public class TabBody extends javax.swing.JPanel {
             ColorString team = new ColorString();
             team.color = SoldatServer.teamIdToColor[player.team];
             team.string = SoldatServer.teamIdToString[player.team];
-            Icon country = Icons.ipCountryIcon(player.ip);
+            Icon countryIcon = null;
 
-            IconString playerIcon = new IconString(country == null ? null : country, player.name);
+            if (!player.isBot()) {
+                countryIcon = Icons.ipCountryIcon(player.ip);
+            }
+
+            IconString playerIcon = new IconString(countryIcon, player.name);
             playerIcon.Player = player.name;
             playerIcon.Type = "PlayerMenu";
             playerIcon.Id = player.id;
@@ -794,8 +798,8 @@ public class TabBody extends javax.swing.JPanel {
                 player.kills,
                 player.deaths,
                 player.hwid,
-                player.ip.equals("0.0.0.0") ? "" : player.ip,
-                player.ip.equals("0.0.0.0") ? new IconString(Icons.getBotIcon(), "")
+                player.isBot() ? "" : player.ip,
+                player.isBot() ? new IconString(Icons.getBotIcon(), "")
                         : new IconString(null, ""+player.ping)
             });
         }

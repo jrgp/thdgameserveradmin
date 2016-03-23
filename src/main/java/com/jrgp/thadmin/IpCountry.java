@@ -18,26 +18,47 @@
 
 package com.jrgp.thadmin;
 
-import com.wealoha.ipgeolocation.IpCountryHelper;
+import com.maxmind.geoip.LookupService;
+import java.io.IOException;
+import java.net.URL;
+
 
 /**
  *
  * @author joe
  */
 public class IpCountry {
-    
+
+    private static LookupService Lookup = null;
+
     public static void Load() {
+
+        URL datfile = ClassLoader.getSystemResource("GeoIP.dat");
+
+        if (datfile == null) {
+            System.out.println("ip2counry datfile missing. lookups will all fail.");
+            return;
+        }
+
+        try {
+            Lookup = new LookupService(datfile.getPath(), LookupService.GEOIP_MEMORY_CACHE);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
     }
     
     public static String lookup(String ip) {
-        
-        // XXX: pick a different ip2country library!
-        return null;
-        
-        String country = IpCountryHelper.getCountry(ip);
-        System.out.println("Found country "+country+" for ip "+ip);
-        if (country.equals(""))
+        if (Lookup == null) {
             return null;
+        }
+        
+        String country = Lookup.getCountry(ip).getCode();
+        
+        if (country.equals("--")) {
+            return null;
+        }
+
         return country;
     }
 }

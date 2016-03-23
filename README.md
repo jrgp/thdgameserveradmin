@@ -13,6 +13,7 @@ Screenshots:
 
 # Compile:
 
+    ./update_ipdb.sh
     mvn package
 
 # Run:

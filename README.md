@@ -15,10 +15,16 @@ Screenshots:
 
     ./update_ipdb.sh
     mvn package
+    chmod +x target/thdadmin-pkg/bin/thdadmin.sh
 
 # Run:
 
-    java -jar target/thdadmin-1.0.jar
+    target/thdadmin-pkg/bin/thdadmin.sh
+
+or
+
+    target/thdadmin-pkg/bin/thdadmin.bat
+
 
 # Features:
 

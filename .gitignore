@@ -7,3 +7,5 @@ res/favorites.conf
 target
 nbactions.xml
 GeoIP.dat
+*swp
+dependency-reduced-pom.xml

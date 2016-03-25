@@ -23,12 +23,14 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONTokener;
+
 
 /**
  *
@@ -37,57 +39,25 @@ import java.util.logging.Logger;
 public class FavoriteServers {
 
     private static List<FavoriteServer> Servers = new ArrayList<>();
-    private final static URL serversConfPath = ClassLoader.getSystemResource("favorites.conf");
+    private final static String FavoritesConfPath = System.getProperty("user.home") + "/thdadmin_favorites.json";
 
     public static void Load() {
 
-        if (serversConfPath == null) {
-            System.out.println("Failed getting path to favorites.conf..");
-            return;
-        }
-
         Servers.clear();
 
-        InputStream confStream;
-        BufferedReader confReader;
-        String line;
-
-        FavoriteServer Server = new FavoriteServer();
-        String[] parts;
-
         try {
-            confStream = serversConfPath.openStream();
-            confReader = new BufferedReader(new FileReader("res/favorites.conf")); //new InputStreamReader(confStream));
-            while ((line = confReader.readLine()) != null) {
+            BufferedReader confReader = new BufferedReader(new FileReader(FavoritesConfPath)); //new InputStreamReader(confStream));
+            JSONObject contents = (JSONObject) new JSONTokener(confReader).nextValue();
+            JSONArray servers = contents.getJSONArray("servers");
 
-                line = line.trim();
-
-                if (line.startsWith(";")) {
-                    continue;
-                }
-
-                parts = line.split(":", 2);
-
-                switch (parts[0]) {
-                    case "ip":
-                        Server.Ip = parts[1];
-                    break;
-                    case "port":
-                        Server.Port = Integer.parseInt(parts[1]);
-                    break;
-                    case "password":
-                        Server.Password = parts[1];
-                    break;
-                    case "type":
-                        Server.Type = ServerTypeString.StringToType(parts[1]);
-                    break;
-                }
-
-                if (Server.Ip != null && Server.Port > 0 && Server.Password != null && Server.Type != null) {
-                    Servers.add(Server);
-                    System.out.println("Found server: "+Server);
-                    Server = new FavoriteServer();
-                }
+            for (int i = 0; i < servers.length(); i++) {
+                JSONObject json_server = servers.getJSONObject(i);
+                FavoriteServer Server = new FavoriteServer();
+                Server.Ip = json_server.getString("ip");
+                Server.Port = json_server.getInt("port");
+                Server.Password = json_server.getString("password");
+                Server.Type = ServerTypeString.StringToType(json_server.getString("type"));
+                Servers.add(Server);
             }
         }
         catch (IOException e) {
@@ -97,20 +67,21 @@ public class FavoriteServers {
 
     public static void Save() {
 
-        if (serversConfPath == null)
-            return;
+        JSONArray serversArray = new JSONArray();
 
-        try {
-            BufferedWriter out = new BufferedWriter(new FileWriter("res/favorites.conf"));
+        for (FavoriteServer Server : Servers) {
+             JSONObject serverObject = new JSONObject();
+             serverObject.put("type", ServerTypeString.TypeToString(Server.Type));
+             serverObject.put("ip", Server.Ip);
+             serverObject.put("port", Server.Port);
+             serverObject.put("password", Server.Password);
+             serversArray.put(serverObject);
+         }
 
-            for (FavoriteServer Server : Servers) {
-                out.write("type:"+ServerTypeString.TypeToString(Server.Type)+"\n");
-                out.write("ip:"+Server.Ip+"\n");
-                out.write("port:"+Server.Port+"\n");
-                out.write("password:"+Server.Password+"\n");
-                out.write("\n");
-            }
-
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(FavoritesConfPath))) {
+            JSONObject wrapper = new JSONObject();
+            wrapper.put("servers", serversArray);
+            out.write(wrapper.toString(4));
             out.close();
         }
         catch (IOException ex) {

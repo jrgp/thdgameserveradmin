@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -39,14 +40,14 @@ import org.json.JSONTokener;
 public class FavoriteServers {
 
     private static List<FavoriteServer> Servers = new ArrayList<>();
-    private final static String FavoritesConfPath = System.getProperty("user.home") + "/thdadmin_favorites.json";
+    private final static URL FavoritesConfPath = ClassLoader.getSystemResource("favorites.conf");
 
     public static void Load() {
 
         Servers.clear();
 
         try {
-            BufferedReader confReader = new BufferedReader(new FileReader(FavoritesConfPath)); //new InputStreamReader(confStream));
+            BufferedReader confReader = new BufferedReader(new FileReader(FavoritesConfPath.getPath()));
             JSONObject contents = (JSONObject) new JSONTokener(confReader).nextValue();
             JSONArray servers = contents.getJSONArray("servers");
 
@@ -59,6 +60,9 @@ public class FavoriteServers {
                 Server.Type = ServerTypeString.StringToType(json_server.getString("type"));
                 Servers.add(Server);
             }
+        }
+        catch (org.json.JSONException e) {
+            System.out.println("Failed parsing json: "+e);
         }
         catch (IOException e) {
             System.out.println("Failed reading servers: "+e);
@@ -78,7 +82,7 @@ public class FavoriteServers {
              serversArray.put(serverObject);
          }
 
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(FavoritesConfPath))) {
+        try (BufferedWriter out = new BufferedWriter(new FileWriter(FavoritesConfPath.getPath()))) {
             JSONObject wrapper = new JSONObject();
             wrapper.put("servers", serversArray);
             out.write(wrapper.toString(4));

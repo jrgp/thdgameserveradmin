@@ -22,11 +22,10 @@ import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.*;
 import javax.swing.SwingWorker;
 import static com.jrgp.thadmin.ServerType.KAG;
+import org.slf4j.LoggerFactory;
 
 
 class KagNotif {
@@ -58,6 +57,8 @@ class KagNotif {
  */
 public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInstance {
 
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(KagServer.class);
+
     private Socket Sock = null;
     private BufferedReader In = null;
     private DataOutputStream Out = null;
@@ -88,7 +89,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
     @Override
     public void Connect () {
 
-        System.out.println(String.format("Connecting to %s:%d with %s", Host, Port, Password));
+        LOGGER.info("Connecting to {}:{} with {}", Host, Port, Password);
 
         Connected = false;
 
@@ -105,7 +106,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
 
     @Override
     public void Disconnect() {
-        System.out.println("Disconnecting");
+        LOGGER.info("Disconnecting");
         try {
             Sock.close();
             In.close();
@@ -120,14 +121,14 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
     @Override
     public void sendCommand(String line) {
         if (!Connected) {
-            System.out.println("Cannot write if we're not connected");
+            LOGGER.debug("Cannot write to socket if we're not connected");
             return;
         }
         try {
             Out.writeBytes(line+"\n");
         }
         catch (IOException e) {
-            System.out.println("Failed writing");
+            LOGGER.error("Failed writing to socket", e);
         }
     }
 
@@ -135,11 +136,11 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
     public void kickPlayer(int id) {
         if (!Connected)
             return;
-        System.out.println("Will kick player ID "+id);
+        LOGGER.info("Will kick player ID ", id);
         try {
             Out.writeBytes("/kickid "+id+"\n");
-        } catch (IOException ex) {
-            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.error("Failed writing to socket to kick player", e);
         }
     }
 
@@ -147,20 +148,18 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
     public void banPlayer(int id) {
         if (!Connected)
             return;
-        System.out.println("Will ban player ID "+id);
+        LOGGER.info("Will ban player ID ", id);
         try {
             Out.writeBytes("/banid "+id+"\n");
-        } catch (IOException ex) {
-            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.error("Failed writing to socket to ban player", e);
         }
     }
 
     @Override
     protected Void doInBackground() throws Exception {
-        System.out.println("in background");
-
         if (Connected) {
-            System.out.println("Already connected?");
+            LOGGER.debug("Not starting background thread if we're already connected");
             return null;
         }
 
@@ -182,7 +181,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                 // Only way we can watch for this thread being killed (user clicking disconnect)
                 // is if we çheck the result of this method call often
                 if (Thread.interrupted()) {
-                    System.out.println("got interrupt");
+                    LOGGER.debug("Thread got interrupt; disconnecting.");
                     throw new InterruptedException();
                 }
 
@@ -190,7 +189,7 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                 // to see if writing fails. Fortunately kag doesn't care if we send it shit. We can conveiently
                 // use this to check for players...
                 if (i % 100 == 0) {
-                    System.out.println("Sending keepalive to see if writing fails which means we're disconnected");
+                    LOGGER.debug("Sending keepalive to see if writing fails which means we're disconnected");
                     Out.writeBytes("/players\n");
                     Out.flush();
                 }
@@ -210,8 +209,8 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
                     publish(KagNotif.eventFactory("Connected"));
                 }
 
-                //System.out.println("Received line via while: '"+line+"'");
                 line = line.trim();
+                LOGGER.info("Received '{}' in while", line);
 
                 if ((playermatcher = KagRegexes.linePlayer.matcher(line)) != null
                         && playermatcher.find()) {
@@ -252,10 +251,10 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
             }
         }
         catch (IOException e) {
-
+            LOGGER.error("Failed socket work", e);
         }
         catch (InterruptedException e) {
-            System.out.println("Disconnecting via interrupt");
+            LOGGER.info("Disconnecting via interrupt");
         }
         finally  {
             Disconnect();
@@ -268,7 +267,6 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
 
         for (KagNotif notif : messages) {
             if (notif.Type.equals("line")) {
-                //System.out.println("Recieved line via process: "+notif.Line);
                 Window.addConsoleLine(notif.Line, "console");
             }
             else if (notif.Type.equals("event") && notif.Event.equals("Disconnected")) {
@@ -287,7 +285,6 @@ public class KagServer extends SwingWorker<Void, KagNotif> implements ServerInst
         fav.Port = Port;
         fav.Password = Password;
         fav.Type = KAG;
-        System.out.println(fav);
         return fav;
     }
 }

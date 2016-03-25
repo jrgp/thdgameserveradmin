@@ -20,6 +20,7 @@ import javax.swing.text.Style;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
+import org.slf4j.LoggerFactory;
 
 /*
  * Copyright (C) 2014 joe
@@ -73,6 +74,9 @@ class IconString {
  * @author joe
  */
 public class TabBody extends javax.swing.JPanel {
+
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SoldatServer.class);
+
     private ServerInstance Server = null;
     private boolean Connected = false;
 
@@ -403,7 +407,7 @@ public class TabBody extends javax.swing.JPanel {
             HandleDisonnect();
         }
         else if (ConnectButton.getText().equals("Connect")) {
-            System.out.println("clicked connect");
+            LOGGER.info("Clicked connect");
             HandleConnect();
         }
     }//GEN-LAST:event_ConnectButtonActionPerformed
@@ -506,8 +510,6 @@ public class TabBody extends javax.swing.JPanel {
             return;
         }
 
-        System.out.println("passed checks");
-
         ConnectButton.setEnabled(false);
 
         hostString = IpPort;
@@ -538,10 +540,8 @@ public class TabBody extends javax.swing.JPanel {
 
         boolean success = Server.cancel(true);
 
-        if (success)
-            System.out.println("Cancelled worker");
-        else
-            System.out.println("Failed to cancel worker");
+        if (!success)
+            LOGGER.error("Failed to cancel worker thread");
     }
 
     public void addConsoleLine(String line, String type) {

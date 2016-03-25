@@ -21,6 +21,8 @@ package com.jrgp.thadmin;
 import com.maxmind.geoip.LookupService;
 import java.io.IOException;
 import java.net.URL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 /**
@@ -28,6 +30,7 @@ import java.net.URL;
  * @author joe
  */
 public class IpCountry {
+    private final static Logger LOGGER = LoggerFactory.getLogger(IpCountry.class);
 
     private static LookupService Lookup = null;
 
@@ -36,7 +39,7 @@ public class IpCountry {
         URL datfile = ClassLoader.getSystemResource("GeoIP.dat");
 
         if (datfile == null) {
-            System.out.println("ip2counry datfile missing. lookups will all fail.");
+            LOGGER.warn("ip2counry datfile missing. lookups will all fail.");
             return;
         }
 
@@ -44,7 +47,7 @@ public class IpCountry {
             Lookup = new LookupService(datfile.getPath(), LookupService.GEOIP_MEMORY_CACHE);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error("Failed reading maxmind datfile", e);
         }
     }
     
@@ -56,6 +59,7 @@ public class IpCountry {
         String country = Lookup.getCountry(ip).getCode();
         
         if (country.equals("--")) {
+            LOGGER.warn("Couldn't get country for IP {}", ip);
             return null;
         }
 

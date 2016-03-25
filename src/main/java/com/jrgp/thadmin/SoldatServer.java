@@ -27,11 +27,10 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
 import static com.jrgp.thadmin.ServerType.SOLDAT;
+import org.slf4j.LoggerFactory;
 
 class SoldatNotif {
 
@@ -61,6 +60,7 @@ class SoldatNotif {
  * @author joe
  */
 public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements ServerInstance {
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(SoldatServer.class);
 
     private static final int refreshSize = 1188;
 
@@ -111,7 +111,7 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
     @Override
     public void Connect () {
 
-        System.out.println(String.format("Connecting to %s:%d with %s", Host, Port, Password));
+        LOGGER.info("Connecting to {}:{} with {}", Host, Port, Password);
 
         Connected = false;
 
@@ -129,15 +129,15 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
     @Override
     public void sendCommand(String line) {
         if (!Connected) {
-            System.out.println("Cannot write if we're not connected");
+            LOGGER.debug("Cannot write if we're not connected");
             return;
         }
         try {
             Out.writeBytes(line+"\n");
-            System.out.println("wrote "+line);
+            LOGGER.info("Wrote '{}' to socket", line);
         }
         catch (IOException e) {
-            System.out.println("Failed writing");
+            LOGGER.error("Failed writing", e);
         }
     }
 
@@ -155,7 +155,7 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
     @Override
     public void Disconnect() {
-        System.out.println("Disconnecting");
+        LOGGER.info("Disconnecting");
         try {
             Sock.close();
             In.close();
@@ -170,10 +170,9 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
     @Override
     protected Void doInBackground() throws Exception {
-        System.out.println("in background");
 
         if (Connected) {
-            System.out.println("Already connected?");
+            LOGGER.debug("Not starting background thread if we're already connected");
             return null;
         }
 
@@ -194,14 +193,14 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                 // Only way we can watch for this thread being killed (user clicking disconnect)
                 // is if we çheck the result of this method call often
                 if (Thread.interrupted()) {
-                    System.out.println("got interrupt");
+                    LOGGER.debug("Thread got interrupt; disconnecting.");
                     throw new InterruptedException();
                 }
 
                 // With java there is no way of detecting when a socket closes on the remote end except
                 // to see if writing fails.
                 if (i % 25 == 0) {
-                    System.out.println("Sending REFRESHX to see if writing fails which means we're disconnected");
+                    LOGGER.info("Sending REFRESHX to see if writing fails which means we're disconnected");
                     Out.writeBytes("REFRESHX\n");
                     Out.flush();
                 }
@@ -217,18 +216,18 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                     break;
 
                 if (line.equals("REFRESH")) {
-                    System.out.println("I am expecting refresh packet...");
+                    LOGGER.info("I am expecting refresh packet...");
                     try {
-                       System.out.println("Got bytes for refresh: "+In.read(refresh, 0, refreshSize));
+                       LOGGER.info("Got bytes for refresh: {}", In.read(refresh, 0, refreshSize));
                        parseRefresh(refresh);
                     }
                     catch (IOException e) {
-                        System.out.println("failed refresh: "+e);
+                        LOGGER.error("failed refresh: "+e);
                     }
                     continue;
                 }
                 else if (line.equals("REFRESHX")) {
-                    System.out.println("I am expecting refreshx packet...");
+                    LOGGER.info("I am expecting refreshx packet...");
 
                     try {
                         int recv, j = 0;
@@ -237,20 +236,15 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                             if (recv < 1)
                                 break;
                             j += recv;
-                            System.out.println("Got bytes"+recv);
                         }
-                        System.out.println("Got bytes for refreshx: "+j);
+                        LOGGER.info("Got {} bytes for refreshx", j);
                         parseRefreshX(refreshx);
                     }
                     catch (Exception e) {
-                        System.out.println("issue with refreshx:");
-                        e.printStackTrace();
+                        LOGGER.error("Issue parsing refreshx", e);
                     }
 
                     continue;
-                }
-                else {
-                    System.out.println("not expecting refresh");
                 }
 
                 if (!Connected) {
@@ -262,21 +256,20 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
                     ServerVersion = match.group(1);
                 }
 
-                System.out.println("Received line via while: '"+line+"'");
+                LOGGER.info("Received line via while: {}", line);
                 line = line.trim();
 
                 publish(SoldatNotif.lineFactory(line));
             }
         }
         catch (IOException e) {
-            System.out.println("Io socket exception: "+e);
+            LOGGER.error("Failed socket work", e);
         }
         catch (InterruptedException e) {
-            System.out.println("Disconnecting via interrupt");
+            LOGGER.info("Disconnecting via interrupt");
         }
         catch (Exception e) {
-            System.out.println("caught something else: " + e);
-            e.printStackTrace();
+            LOGGER.error("Some other issue", e);
         }
         finally  {
             Disconnect();
@@ -289,7 +282,6 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
         for (SoldatNotif notif : messages) {
             if (notif.Type.equals("line")) {
-                System.out.println("Recieved line via process: "+notif.Line);
                 Window.addConsoleLine(notif.Line, "console");
             }
             else if (notif.Type.equals("event") && notif.Event.equals("Disconnected")) {
@@ -518,7 +510,6 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
 
         // map
         j = refreshx[pos];
-        System.out.println("map length: "+j);
         pos++;
         for (i = 0; i < j; i++) {
             map += refreshx[pos];
@@ -534,7 +525,7 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         currentTime = buff.getInt(pos);
         pos += 4;
 
-        System.out.println("Time: "+currentTime+"/"+timeLimit);
+        LOGGER.info("Time: {}/{}", currentTime, timeLimit);
 
         // kill limit
         killLimit = buff.getShort(pos);
@@ -552,9 +543,9 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         passworded = refreshx[pos] == 1;
         pos++;
 
-        System.out.println("Gametype: "+gameType);
-        System.out.println("max players: "+maxPlayers);
-        System.out.println("passworded: "+(passworded ? "Yes" : "no"));
+        LOGGER.info("Gametype: {}");
+        LOGGER.info("Max players: {}", maxPlayers);
+        LOGGER.info("Private: {}", passworded ? "Yes" : "no");
 
         // next map
         j = refreshx[pos];
@@ -568,11 +559,10 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
         for (SoldatPlayer player : players) {
             if (player.name.equals(""))
                 continue;
-            System.out.println("Player: "+player.name+" hwid: "+player.hwid+" team: "+player.team+" kills: "+player.kills+" deaths: "+player.deaths+" ping: "+
-                    player.ping+" x:"+player.x+" y: "+player.y);
+            LOGGER.info("Player {} hwid: {} team: {} kills: {} deaths: {} ping: {} x,y: {},{}", player.name, player.hwid, player.team, player.kills, player.deaths, player.ping, player.x, player.y);
         }
 
-        System.out.println("Current map: '"+map+"' next map: '"+nextMap+"'");
+        LOGGER.info("Current map: {} Next map: {}", map, nextMap);
 
 
         Window.drawSoldatPlayers(players);
@@ -583,11 +573,11 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
     public void kickPlayer(int id) {
         if (!Connected)
             return;
-        System.out.println("Will kick player ID "+id);
+        LOGGER.info("Will kick player ID ", id);
         try {
             Out.writeBytes("/kick "+id+"\n");
-        } catch (IOException ex) {
-            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.error("Failed writing to socket to kick player", e);
         }
     }
 
@@ -595,11 +585,11 @@ public class SoldatServer extends SwingWorker<Void, SoldatNotif> implements Serv
     public void banPlayer(int id) {
         if (!Connected)
             return;
-        System.out.println("Will ban player ID "+id);
+        LOGGER.info("Will ban player ID ", id);
         try {
             Out.writeBytes("/ban "+id+"\n");
-        } catch (IOException ex) {
-            Logger.getLogger(KagServer.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException e) {
+            LOGGER.error("Failed writing to socket to ban player", e);
         }
     }
 

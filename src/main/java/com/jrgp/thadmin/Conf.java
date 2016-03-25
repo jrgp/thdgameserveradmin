@@ -25,6 +25,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -32,6 +34,8 @@ import java.util.HashMap;
  */
 public class Conf {
     private static HashMap<String, Color> colors = null;
+    private final static Logger LOGGER = LoggerFactory.getLogger(Conf.class);
+
 
     public static void Load() {
 
@@ -67,7 +71,7 @@ public class Conf {
     public static Color getColor(String key) {
         Color color = colors.get(key);
         if (color == null) {
-            System.out.println("Missing color key "+key+"; defaulting to gray");
+            LOGGER.warn("Missing color key {}; defaulting to gray.", key);
             return Color.gray;
         }
         else {

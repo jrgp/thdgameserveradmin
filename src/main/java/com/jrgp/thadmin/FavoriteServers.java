@@ -26,8 +26,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import org.json.JSONObject;
 import org.json.JSONArray;
 import org.json.JSONTokener;
@@ -41,6 +42,7 @@ public class FavoriteServers {
 
     private static List<FavoriteServer> Servers = new ArrayList<>();
     private final static URL FavoritesConfPath = ClassLoader.getSystemResource("favorites.conf");
+    private final static Logger LOGGER = LoggerFactory.getLogger(FavoriteServers.class);
 
     public static void Load() {
 
@@ -62,10 +64,10 @@ public class FavoriteServers {
             }
         }
         catch (org.json.JSONException e) {
-            System.out.println("Failed parsing json: "+e);
+            LOGGER.error("Failed parsing favorites JSON", e);
         }
         catch (IOException e) {
-            System.out.println("Failed reading servers: "+e);
+            LOGGER.error("Failed reading favorites file", e);
         }
     }
 
@@ -88,8 +90,8 @@ public class FavoriteServers {
             out.write(wrapper.toString(4));
             out.close();
         }
-        catch (IOException ex) {
-            Logger.getLogger(FavoriteServers.class.getName()).log(Level.SEVERE, null, ex);
+        catch (IOException e) {
+            LOGGER.error("Failed writing favorites.conf", e);
         }
     }
 
@@ -119,7 +121,7 @@ public class FavoriteServers {
 
     public static void connectServers(MainWindow window) {
         for (FavoriteServer Server : Servers) {
-            System.out.println("Auto connecting to: "+Server);
+            LOGGER.info("Auto connecting to: {}", Server);
             TabBody tab = new TabBody(Server.Type, window);
             window.addTab(tab, "Server");
             tab.SetServerAndJoin(Server.Ip, Server.Port, Server.Password);

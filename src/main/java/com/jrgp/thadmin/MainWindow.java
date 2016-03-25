@@ -19,6 +19,7 @@
 package com.jrgp.thadmin;
 
 import java.util.ArrayList;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -27,6 +28,8 @@ import java.util.ArrayList;
 public class MainWindow extends javax.swing.JFrame {
 
     ArrayList<TabBody> serverTabs;
+
+    private final static org.slf4j.Logger LOGGER = LoggerFactory.getLogger(MainWindow.class);
 
     /**
      * Creates new form ServerTabs
@@ -158,7 +161,7 @@ public class MainWindow extends javax.swing.JFrame {
             }
         }
         if (tabIndexToKill == -1) {
-            System.out.println("wtf couldnt find index");
+            LOGGER.error("Couldn't find index to kill tab");
             return;
         }
         component.HandleDisonnect();

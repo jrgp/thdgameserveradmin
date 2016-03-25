@@ -21,6 +21,8 @@ package com.jrgp.thadmin;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import static com.jrgp.thadmin.IpCountry.lookup;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -28,15 +30,19 @@ import static com.jrgp.thadmin.IpCountry.lookup;
  */
 public class Icons {
 
+    private final static Logger LOGGER = LoggerFactory.getLogger(Icons.class);
+
     public static Icon getIcon(ServerType type) {
         
         if (type == ServerType.KAG) {
             return new ImageIcon(ClassLoader.getSystemResource("kag_icon.png"));
         }
         else if (type == ServerType.SOLDAT) {
-            return  new ImageIcon(ClassLoader.getSystemResource("soldat_icon.png"));
+            return new ImageIcon(ClassLoader.getSystemResource("soldat_icon.png"));
         }
         
+        LOGGER.warn("Unkown game type: {}", type);
+
         return null;
     }
     
@@ -47,6 +53,7 @@ public class Icons {
     public static Icon ipCountryIcon(String ip) {
         String code = lookup(ip);
         if (code == null) {
+            LOGGER.warn("Not getting country icon for IP {}", ip);
             return null;
         }
         return new ImageIcon(ClassLoader.getSystemResource("flags/"+code.toLowerCase()+".png"));

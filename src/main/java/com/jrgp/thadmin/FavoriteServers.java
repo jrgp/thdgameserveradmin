@@ -41,7 +41,7 @@ import org.json.JSONTokener;
 public class FavoriteServers {
 
     private static List<FavoriteServer> Servers = new ArrayList<>();
-    private final static URL FavoritesConfPath = ClassLoader.getSystemResource("favorites.conf");
+    private final static URL FavoritesConfPath = ClassLoader.getSystemResource("favorites.json");
     private final static Logger LOGGER = LoggerFactory.getLogger(FavoriteServers.class);
 
     public static void Load() {

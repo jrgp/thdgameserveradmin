@@ -19,12 +19,11 @@
 package com.jrgp.thadmin;
 
 import java.awt.Color;
-import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
+import org.ini4j.Ini;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,30 +40,17 @@ public class Conf {
 
         colors = new HashMap<>();
 
-        URL colorsPath = ClassLoader.getSystemResource("colors.conf");
-        InputStream colorStream = null;
-        BufferedReader colorReader = null;
-        String line;
+        URL colorsPath = ClassLoader.getSystemResource("colors.ini");
 
         try {
-            colorStream = colorsPath.openStream();
-            colorReader = new BufferedReader(new InputStreamReader(colorStream));
-
-            while ((line = colorReader.readLine()) != null) {
-                String parts[] = line.split(" ");
-                if (parts[0].equals(";") || parts.length != 2)
-                    continue;
-                try {
-                  colors.put(parts[0], Color.decode("#"+parts[1]));
-                }
-                catch (NumberFormatException e) {
-                }
+            Ini ini = new Ini(new FileReader(colorsPath.getPath()));
+            Ini.Section section = ini.get("colors");
+            for (String key: section.keySet()) {
+                colors.put(key, Color.decode("#" + section.get(key)));
             }
-
-            colorStream.close();
-            colorReader.close();
         }
         catch (IOException e) {
+            LOGGER.error("Failed parsing colors.conf", e);
         }
     }
 

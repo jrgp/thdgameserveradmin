@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Joe Gillotti
+ * Copyright (C) 2014 joe
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -16,22 +16,25 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.servers.soldat;
 
 /**
  *
  * @author joe
  */
-public class KagPlayer {
-    public String name;
-    public Integer id;
-    public String hwid;
-    public String ip;
-    
-    public KagPlayer(String name, Integer id, String ip, String hwid) {
-        this.name = name;
-        this.id = id;
-        this.hwid = hwid;
-        this.ip = ip;
+public class SoldatPlayer {
+    public String name = "";
+    public int id = -1;
+    public String hwid = "";
+    public String ip = "";
+    public int team;
+    public long  kills;
+    public long deaths;
+    public int ping;
+    public double x;
+    public double y;
+    public int caps;
+    public boolean isBot() {
+        return ip.equals("0.0.0.0");
     }
 }

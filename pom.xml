@@ -29,7 +29,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.jrgp.thadmin.MainWindow</mainClass>
+                            <mainClass>com.jrgp.thadmin.ui.MainWindow</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -52,7 +52,7 @@
                     </platforms>
                     <programs>
                         <program>
-                            <mainClass>com.jrgp.thadmin.MainWindow</mainClass>
+                            <mainClass>com.jrgp.thadmin.ui.MainWindow</mainClass>
                             <name>thdadmin</name>
                         </program>
                     </programs>

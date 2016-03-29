@@ -16,8 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.conf;
 
+import com.jrgp.thadmin.ui.MainWindow;
+import com.jrgp.thadmin.ui.TabBody;
+import com.jrgp.thadmin.servers.ServerTypeString;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;

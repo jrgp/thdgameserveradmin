@@ -16,8 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.servers.soldat;
 
+import com.jrgp.thadmin.conf.FavoriteServer;
+import com.jrgp.thadmin.servers.ServerInstance;
+import com.jrgp.thadmin.ui.TabBody;
 import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -29,7 +32,7 @@ import java.nio.ByteOrder;
 import java.util.List;
 import java.util.regex.Matcher;
 import javax.swing.SwingWorker;
-import static com.jrgp.thadmin.ServerType.SOLDAT;
+import static com.jrgp.thadmin.servers.ServerType.SOLDAT;
 import org.slf4j.LoggerFactory;
 
 class SoldatNotif {

@@ -16,23 +16,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.servers;
 
 /**
  *
  * @author joe
  */
-public interface ServerInstance {
-    public void Connect();
-    public void setDetails(String Host, String Password, Integer Port);
-    public void setWindow(TabBody Window);
-    public void Disconnect();
-    public void sendCommand(String line);
-    public void kickPlayer(int id);
-    public void banPlayer(int id);
-    public FavoriteServer getFavServer();
-
-    // from swingworker
-    public void execute();
-    public boolean cancel(boolean doit);
+public enum ServerType {
+    KAG,
+    SOLDAT,
+    STORM;
 }

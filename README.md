@@ -14,7 +14,7 @@ Screenshots:
 # Compile:
 
     ./update_ipdb.sh
-    mvn package
+    mvn clean package
     chmod +x target/thdadmin-pkg/bin/thdadmin.sh
 
 # Run:

@@ -16,15 +16,19 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.servers.kag;
 
+import com.jrgp.thadmin.conf.FavoriteServer;
+import com.jrgp.thadmin.servers.ServerInstance;
+import com.jrgp.thadmin.ui.TabBody;
+import com.jrgp.thadmin.servers.kag.KagPlayer;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.*;
 import javax.swing.SwingWorker;
-import static com.jrgp.thadmin.ServerType.KAG;
+import static com.jrgp.thadmin.servers.ServerType.KAG;
 import org.slf4j.LoggerFactory;
 
 

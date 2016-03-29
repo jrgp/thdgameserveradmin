@@ -16,11 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.ui;
 
+import com.jrgp.thadmin.servers.ServerType;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
-import static com.jrgp.thadmin.IpCountry.lookup;
+import static com.jrgp.thadmin.conf.IpCountry.lookup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

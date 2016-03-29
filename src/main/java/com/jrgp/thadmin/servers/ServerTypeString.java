@@ -16,11 +16,11 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.servers;
 
-import static com.jrgp.thadmin.ServerType.KAG;
-import static com.jrgp.thadmin.ServerType.SOLDAT;
-import static com.jrgp.thadmin.ServerType.STORM;
+import static com.jrgp.thadmin.servers.ServerType.KAG;
+import static com.jrgp.thadmin.servers.ServerType.SOLDAT;
+import static com.jrgp.thadmin.servers.ServerType.STORM;
 
 /**
  *

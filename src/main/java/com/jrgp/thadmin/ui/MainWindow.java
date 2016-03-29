@@ -16,8 +16,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.jrgp.thadmin;
+package com.jrgp.thadmin.ui;
 
+import com.jrgp.thadmin.conf.Colors;
+import com.jrgp.thadmin.conf.FavoriteServers;
+import com.jrgp.thadmin.conf.IpCountry;
+import com.jrgp.thadmin.servers.ServerType;
 import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +47,7 @@ public class MainWindow extends javax.swing.JFrame {
         addSoldatButton.setIcon(Icons.getIcon(ServerType.SOLDAT));
 
         IpCountry.Load();
-        Conf.Load();
+        Colors.Load();
         FavoriteServers.Load();
         FavoriteServers.connectServers(this);
     }

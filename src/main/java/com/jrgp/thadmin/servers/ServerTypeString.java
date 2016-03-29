@@ -20,7 +20,6 @@ package com.jrgp.thadmin.servers;
 
 import static com.jrgp.thadmin.servers.ServerType.KAG;
 import static com.jrgp.thadmin.servers.ServerType.SOLDAT;
-import static com.jrgp.thadmin.servers.ServerType.STORM;
 
 /**
  *
@@ -33,8 +32,6 @@ public class ServerTypeString {
                 return "Soldat";
             case KAG:
                 return "KAG";
-            case STORM:
-                return "Storm";
         }
         return null;
     }
@@ -44,8 +41,6 @@ public class ServerTypeString {
                 return SOLDAT;
             case "kag":
                 return KAG;
-            case "storm":
-                return STORM;
         }
         return null;
     }

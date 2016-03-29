@@ -24,6 +24,5 @@ package com.jrgp.thadmin.servers;
  */
 public enum ServerType {
     KAG,
-    SOLDAT,
-    STORM;
+    SOLDAT
 }

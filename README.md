@@ -6,7 +6,7 @@ This is a kinda simple swing app which connects to the socket admin game server 
 
 ![Screenshot on Windows](http://jrgp.us/screenshots/kagadmin12.png)
 
-Screenshots: 
+Screenshots:
 - http://jrgp.us/screenshots/kagadmin11.png
 - http://jrgp.us/screenshots/kagadmin12.png
 - http://jrgp.us/screenshots/kagadmin13.png
@@ -35,7 +35,7 @@ or
 
 # Notes:
 
-- It's developed in Neatbeans as it allegedly has better support for designing Swing forums
+- It's developed in Netbeans as it allegedly has better support for designing Swing forums
 - Licensed under GPL
 
 # Contact:
